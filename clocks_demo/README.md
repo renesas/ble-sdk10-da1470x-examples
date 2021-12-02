@@ -28,6 +28,8 @@ enter sleep mode. So it is suggested to use OQSPI builds to see also the clock s
 Requirements
 -----------------------------------------
 - Dialog DA1470x Development Board
+- This software example has been tested with SDK10.3.1.22.35
+
 - UART terminal with the following settings is needed to observe the logs.
 
 | Setting      | Value   |
@@ -44,15 +46,15 @@ Configuration
 A Saleae Logic Analyzer is needed in order to monitor sleep and wakeup states, the button presses, hibernation mode.
 The following GPIOs are used in `clocks_demo` project :
 
-GPIO port		Connector(on FPGA)			Connector on silicon	Functionality
----------		-------------------			--------------------	--------------
-P0_17			(J28:11)   			        J3-P017 pin			 	Monitors when the system enters sleep mode.
-P0_18			(J28:17)					J3-P018 pin				Monitors when the system exits from sleep mode.
-P0_24			(J28:15)					J3-P024 pin				Monitors when PLL is used.
-P0_22			(J28:18)					J3-P022 pin				Monitors when PLL/RCHS@96MHz is requested by HW_TIMER3 ( referred as timer1 in the demo).
-P0_21			(J28:14)					J3-P021 pin				Monitors when PLL/RCHS@96MHz is requested by HW_TIMER4 ( referred as timer2 in the demo).
-P0_23			(J28:12)					J3-P023 pin				Monitors when PLL/RCHS@96MHz is requested by Button1 pressing.
-P1_22           Button1(S3)					J4-P122 pin				Button which requests clock switching.
+|GPIO port		|Connector Dev.Board		|Functionality
+|---------		|--------------------		|--------------
+|P0_17			|J3-P017 pin			 	|Monitors when the system enters sleep mode.
+|P0_18			|J3-P018 pin				|Monitors when the system exits from sleep mode.
+|P0_24			|J3-P024 pin				|Monitors when PLL is used.
+|P0_22			|J3-P022 pin				|Monitors when PLL/RCHS@96MHz is requested by HW_TIMER3 ( referred as timer1 in the demo).
+|P0_21			|J3-P021 pin				|Monitors when PLL/RCHS@96MHz is requested by HW_TIMER4 ( referred as timer2 in the demo).
+|P0_23			|J3-P023 pin				|Monitors when PLL/RCHS@96MHz is requested by Button1 pressing.
+|P1_22          |J4-P122 pin				|Button which requests clock switching.
 
 
 Run the `clocks_demo` project

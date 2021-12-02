@@ -32,6 +32,7 @@ enter sleep mode. So it is suggested to use OQSPI builds in order to be able to 
 Requirements
 -----------------------------------------
 - Dialog DA1470x Development Board.
+- This software example has been tested with SDK10.3.1.22.35
 
 - UART terminal with the following settings is needed to observe the logs.
 
