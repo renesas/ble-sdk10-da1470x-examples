@@ -68,6 +68,16 @@
                                                 ((GPIO_TRIGGER_LEVEL) ? HW_WKUP_TRIG_LEVEL_HI : HW_WKUP_TRIG_LEVEL_LO)
 #endif
 
+/********************************* Custom wake up settings ************************************/
+wkup_config pin_wkup_conf = {
+        .debounce = 10,
+        .pin_wkup_state[KEY1_PORT] = ( 1 << KEY1_PIN ),
+        .pin_gpio_state[KEY1_PORT] = ( 1 << KEY1_PIN) | (1 << KEY2_PIN ),
+        .pin_trigger[KEY1_PORT]    = ( WKUP_TRIGGER_EDGE << KEY1_PIN) | (GPIO_TRIGGER_LEVEL << KEY2_PIN ),
+        .gpio_sense[KEY1_PORT]     = ( GPIO_TRIGGER_SENSITIVITY << KEY1_PIN) | (GPIO_TRIGGER_SENSITIVITY << KEY2_PIN ),
+};
+/********************************************************************************************/
+
 /*
  * Perform any application specific hardware configuration.  The clocks,
  * memory, etc. are configured before main() is called.
@@ -93,8 +103,12 @@ void wkup_deb_interrupt_cb(void)
 
         event = ((trigger == WKUP_TRIGGER_EDGE) ? WKUP_KEY_PRESS_EVENT_NOTIF : WKUP_KEY_RELEASE_EVENT_NOTIF);
 
-        /* Change the trigger polarity so that the WKUP controller is triggered on the opposite edge */
-        hw_wkup_set_trigger(KEY1_PORT, KEY1_PIN, trigger ? HW_WKUP_TRIG_LEVEL_LO_DEB : HW_WKUP_TRIG_LEVEL_HI_DEB);
+        pin_wkup_conf.pin_trigger[KEY1_PORT] = (!trigger<<KEY1_PIN) | (GPIO_TRIGGER_LEVEL<<KEY2_PIN);
+
+        hw_wkup_configure(&pin_wkup_conf);
+
+//        /* Change the trigger polarity so that the WKUP controller is triggered on the opposite edge */
+//        hw_wkup_set_trigger(KEY1_PORT, KEY1_PIN, trigger ? HW_WKUP_TRIG_LEVEL_LO_DEB : HW_WKUP_TRIG_LEVEL_HI_DEB);
 
         OS_TASK_NOTIFY_FROM_ISR(task_h, event, OS_NOTIFY_SET_BITS);
 }
@@ -125,20 +139,20 @@ static void wkup_init(void)
 {
 
         /* Initialize the WKUP controller */
-        hw_wkup_init(NULL);
+        hw_wkup_init(&pin_wkup_conf);
 
 #if (dg_configWKUP_KEY_BLOCK_ENABLE)
         /*
          * Set debounce time expressed in ms. Maximum allowable value is 63 ms.
          * A value set to 0 disables the debounce functionality.
          */
-        hw_wkup_set_key_debounce_time(10);
+        //hw_wkup_set_key_debounce_time(10);
 
         /*
          * Enable interrupts produced by the KEY block of the wakeup controller (debounce
          * circuitry) and register a callback function to hit following a KEY event.
          */
-        hw_wkup_register_key_interrupt(wkup_deb_interrupt_cb, 2);
+        hw_wkup_register_key_interrupt(wkup_deb_interrupt_cb, 1);
 
 
         /*
@@ -147,14 +161,14 @@ static void wkup_init(void)
          * \note The polarity is applied both to KEY and GPIO blocks of the controller
          *
          */
-        hw_wkup_set_trigger(KEY1_PORT, KEY1_PIN, ( WKUP_TRIGGER_EDGE ? HW_WKUP_TRIG_LEVEL_HI_DEB : HW_WKUP_TRIG_LEVEL_LO_DEB ) );
+        //hw_wkup_set_trigger(KEY1_PORT, KEY1_PIN, ( WKUP_TRIGGER_EDGE ? HW_WKUP_TRIG_LEVEL_HI_DEB : HW_WKUP_TRIG_LEVEL_LO_DEB ) );
 #endif
 
 #if (dg_configWKUP_GPIO_P1_BLOCK_ENABLE)
 
         hw_wkup_register_gpio_p1_interrupt(wkup_gpio_interrupt_cb, 1);
 
-        hw_wkup_set_trigger(KEY2_PORT, KEY2_PIN, GPIO_TRIGGER);
+        //hw_wkup_set_trigger(KEY2_PORT, KEY2_PIN, GPIO_TRIGGER);
 #endif
         /* Enable interrupts of WKUP controller */
         hw_wkup_enable_key_irq();
@@ -303,6 +317,14 @@ static void prvSetupHardware( void )
         hw_pdc_set_pending(pdc_wkup_combo_id);
         hw_pdc_acknowledge(pdc_wkup_combo_id);
 #endif
+        pdc_wkup_combo_id = hw_pdc_add_entry(HW_PDC_LUT_ENTRY_VAL(
+                                                KEY1_PORT,
+                                                KEY1_PIN,
+                                                HW_PDC_MASTER_CM33, 0));
+        OS_ASSERT(pdc_wkup_combo_id != HW_PDC_INVALID_LUT_INDEX);
+
+        hw_pdc_set_pending(pdc_wkup_combo_id);
+        hw_pdc_acknowledge(pdc_wkup_combo_id);
 #endif
 
 #if (dg_configWKUP_GPIO_P1_BLOCK_ENABLE)
