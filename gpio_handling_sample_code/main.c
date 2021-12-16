@@ -140,7 +140,7 @@ static bool _ad_prepare_for_sleep(void)
          * GPIO pins must be set in latch disabled state before the ARM M33 enters sleep.
          * Otherwise they may have unexpected behavior.
          */
-        ad_io_configure(output_gpio_cfg, N_OUTPUTS, HW_GPIO_POWER_V33, led_status);
+
         ad_io_set_pad_latch(output_gpio_cfg, N_OUTPUTS, AD_IO_PAD_LATCHES_OP_DISABLE);
 
         return true; // allow M33 to enter sleep
@@ -150,7 +150,6 @@ static bool _ad_prepare_for_sleep(void)
 /* Callback function triggered following a sleep cancellation cycle */
 static void _ad_sleep_canceled(void)
 {
-        ad_io_configure(output_gpio_cfg, N_OUTPUTS, HW_GPIO_POWER_V33, led_status);
         ad_io_set_pad_latch(output_gpio_cfg, N_OUTPUTS, AD_IO_PAD_LATCHES_OP_ENABLE);
 }
 
@@ -207,7 +206,7 @@ static void prvTemplateTask( void *pvParameters )
 
                 printf("you turn me %s baby\n", led_status?"ON":"OFF");
 
-                hw_gpio_toggle(LED1_PORT, LED1_PIN);
+                ad_io_configure(output_gpio_cfg, N_OUTPUTS, HW_GPIO_POWER_V33, led_status);
         }
 }
 
