@@ -20,12 +20,6 @@
 /* This function activates an array of GPIO pins */
 void app_gpio_pins_set_active(gpio_config *gpio_list, HW_GPIO_POWER pin_power)
 {
-        /*
-         * COM power domain (PD_COM) is not always enabled during M33 runtime. Application
-         * must make sure that it's enabled before accessing any GPIO register.
-         */
-        hw_sys_pd_com_enable();
-
         /* Scan all the elements of the array until the end is detected (HW_GPIO_PINCONFIG_END) */
         while (gpio_list->pin != 0xFF) {
                 uint8_t port = APP_GPIO_GET_PORT(gpio_list->pin);
@@ -59,12 +53,6 @@ void app_gpio_pins_set_inactive(gpio_config *gpio_list)
 /* This function activates a single GPIO pin */
 void app_gpio_pin_set_active(gpio_config gpio_cfg, HW_GPIO_POWER pin_power)
 {
-        /*
-         * COM power domain (PD_COM) is not always enabled during M33 runtime. Application
-         * should make sure that it's enabled before accessing any GPIO register.
-         */
-        hw_sys_pd_com_enable();
-
         uint8_t port = APP_GPIO_GET_PORT(gpio_cfg.pin);
         uint8_t pin  = APP_GPIO_GET_PIN(gpio_cfg.pin);
         if (port < HW_GPIO_NUM_PORTS || pin < hw_gpio_port_num_pins[port]) {
@@ -85,15 +73,5 @@ void app_gpio_pin_set_inactive(gpio_config gpio_cfg)
         }
 }
 
-
-/*
- * This function activates and then de-activates a single GPIO pin. It should be used
- * when PD_COM is handled dynamically to change the status of an GPIO OUPUT pin.
- */
-void app_gpio_pin_set(gpio_config gpio_cfg, HW_GPIO_POWER pin_power)
-{
-        app_gpio_pin_set_active(gpio_cfg, pin_power);
-        app_gpio_pin_set_inactive(gpio_cfg);
-}
 
 

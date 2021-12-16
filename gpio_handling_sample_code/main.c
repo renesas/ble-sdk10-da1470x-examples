@@ -28,26 +28,8 @@
 #include "platform_devices.h"
 #include "gpio_handling.h"
 
-
 /* Task priorities */
 #define mainGPIO_TASK_PRIORITY              ( OS_TASK_PRIORITY_NORMAL )
-
-
-/*
- * There are two approaches in enabling the COM power domain (PD_COM) while the ARM M33 is running:
- *      - PD_COM is enabled while M33 is active and deactivated before entering sleep.
- *        This approach imposes increased power consumption (static).
- *
- *      - PD_COM is enabled only when it is required and disabled when not needed anymore
- *        (dynamic).
- *
- * Use this macro to select the desired approach:
- *      - A value set to '1' will handle the PD_COM dynamically
- *      - A value set to '0' will handle the PD_COM statically
- *
- **/
-#define GPIO_HANDLING_DYNAMICALLY           (0)
-
 
 /*
  * Perform any application specific hardware configuration.  The clocks,
@@ -149,12 +131,9 @@ int main( void )
 
 }
 
-
 /* Variable used for storing LED1 status */
 __RETAINED_RW static bool led_status = 0;
 
-
-#if (!GPIO_HANDLING_DYNAMICALLY)
 /* Callback function triggered following a sleep cycle */
 static bool _ad_prepare_for_sleep(void)
 {
@@ -175,15 +154,12 @@ static void _ad_sleep_canceled(void)
         app_gpio_pins_set_active((gpio_config *)output_gpio_cfg, HW_GPIO_POWER_V33);
 
 }
-#endif
 
 /**
  * @brief GPIO handling task
  */
 static void prvTemplateTask( void *pvParameters )
 {
-
-#if (!GPIO_HANDLING_DYNAMICALLY)
         /*
          * Register user-defined callback functions to Power Manager (PM)
          */
@@ -215,14 +191,10 @@ static void prvTemplateTask( void *pvParameters )
                 .ad_sleep_preparation_time = 0,
         };
 
-
         /*
          * Register callback functions to Power Manager (PM).
          */
         pm_register_adapter(&ad_pm_call_backs);
-#endif
-
-
         for ( ;; ) {
 
                 /* Block task execution for 1 second (just to allow the system to enter sleep). */
@@ -236,16 +208,7 @@ static void prvTemplateTask( void *pvParameters )
                 output_gpio_cfg[0].high = led_status;
                 printf("you turn me %s baby\n", led_status?"ON":"OFF");
 
-#if (GPIO_HANDLING_DYNAMICALLY)
-                /*
-                 * API used for changing the status of an GPIO OUUPUT pin when
-                 * PD_COM is handled dynamically.
-                 */
-                app_gpio_pin_set(output_gpio_cfg[0], HW_GPIO_POWER_V33);
-#else
                 hw_gpio_toggle(LED1_PORT, LED1_PIN);
-#endif
-
         }
 }
 
@@ -255,12 +218,8 @@ static void prvTemplateTask( void *pvParameters )
  */
 static void periph_init(void)
 {
-
-#if (!GPIO_HANDLING_DYNAMICALLY)
         /* GPIOs must be set in latch enabled state at M33 wakeup. */
         app_gpio_pins_set_active((gpio_config *)output_gpio_cfg, HW_GPIO_POWER_V33);
-#endif
-
 }
 
 /**

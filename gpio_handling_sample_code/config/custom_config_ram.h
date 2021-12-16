@@ -49,11 +49,7 @@
 #define dg_configUSE_SYS_TRNG                   (0)
 #define dg_configUSE_SYS_DRBG                   (0)
 
-/* LED configuration section */
-#define LED1_PORT       (HW_GPIO_PORT_0)
-#define LED1_PIN        (HW_GPIO_PIN_22)
-#define LED1_MODE       (HW_GPIO_MODE_OUTPUT)
-#define LED1_FUNC       (HW_GPIO_FUNC_GPIO)
+
 /* Include bsp default values */
 #include "bsp_defaults.h"
 /* Include middleware default values */

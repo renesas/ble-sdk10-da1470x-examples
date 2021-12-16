@@ -17,6 +17,11 @@
 
 #include "hw_gpio.h"
 
+/* LED configuration section */
+#define LED1_PORT       (HW_GPIO_PORT_0)
+#define LED1_PIN        (HW_GPIO_PIN_22)
+#define LED1_MODE       (HW_GPIO_MODE_OUTPUT)
+#define LED1_FUNC       (HW_GPIO_FUNC_GPIO)
 
 /*
  * Pins can be grouped according to their functionalities (e.g. input, output). This is
