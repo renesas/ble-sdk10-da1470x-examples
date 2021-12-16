@@ -5,7 +5,7 @@
  *
  * @brief Functions definition for configuring GPIO outside adapter context
  *
- * Copyright (C) 2017-2019 Dialog Semiconductor.
+ * Copyright (C) 2017-2021 Dialog Semiconductor.
  * This computer program includes Confidential, Proprietary Information
  * of Dialog Semiconductor. All Rights Reserved.
  *
