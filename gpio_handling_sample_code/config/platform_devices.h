@@ -15,7 +15,7 @@
 #ifndef PLATFORM_DEVICES_H_
 #define PLATFORM_DEVICES_H_
 
-#include "hw_gpio.h"
+#include "ad.h"
 
 /* LED configuration section */
 #define LED1_PORT       (HW_GPIO_PORT_0)
@@ -27,31 +27,47 @@
  * Pins can be grouped according to their functionalities (e.g. input, output). This is
  * convenient in cases where latch/unlatch functionality is not performed on all pins.
  */
-
 /* Input GPIO pins configuration array */
-__UNUSED static const gpio_config input_gpio_cfg[] = {
-
-        HW_GPIO_PINCONFIG(KEY1_PORT, KEY1_PIN, INPUT_PULLUP, GPIO, false),
-
-        HW_GPIO_PINCONFIG_END // important!!!
+__UNUSED static const ad_io_conf_t input_gpio_cfg[] = {
+        {
+                 .port =  KEY1_PORT,
+                 .pin = KEY1_PIN,
+                 .on = {
+                     .mode = HW_GPIO_MODE_INPUT_PULLUP,
+                     .function = HW_GPIO_FUNC_GPIO
+                  },
+                  .off = {
+                      .mode = HW_GPIO_MODE_INPUT_PULLUP,
+                      .function = HW_GPIO_FUNC_GPIO
+                  },
+            }
+/*TODO: demonstrate KEY usage*/
 };
 
 /*
  * Output GPIO pins configuration array.
  *
  * \note: Since the elements of the array might be modified during the code execution,
- *        you should not assign the attribute 'const'. */
-static gpio_config output_gpio_cfg[] = {
-
-        HW_GPIO_PINCONFIG(LED1_PORT, LED1_PIN, OUTPUT, GPIO, false),
-
-        HW_GPIO_PINCONFIG_END // important!!!
+ *        you should not assign the attribute 'const'. ??*/
+#define N_OUTPUTS 1
+static const ad_io_conf_t output_gpio_cfg[N_OUTPUTS] = {
+    {
+         .port =  LED1_PORT,
+         .pin = LED1_PIN,
+         .on = {
+             .mode = HW_GPIO_MODE_OUTPUT,
+             .function = HW_GPIO_FUNC_GPIO,
+             .high = true
+          },
+          .off = {
+              .mode = HW_GPIO_MODE_OUTPUT,
+              .function = HW_GPIO_FUNC_GPIO
+          },
+    }
 };
 
 /* Miscellaneous pins configuration array (e.g. PWM pins) */
-__UNUSED static gpio_config miscellaneous_gpio_cfg[] = {
-
-        HW_GPIO_PINCONFIG_END // important!!!
+__UNUSED static const ad_io_conf_t miscellaneous_gpio_cfg[] = {
 };
 
 #endif /* PLATFORM_DEVICES_H_ */

@@ -41,6 +41,7 @@
 
 #define dg_configRF_ENABLE_RECALIBRATION        (0)
 
+#define dg_configUART_ADAPTER                   (1) //workaround to get common adapters functions for GPIO
 #define dg_configFLASH_ADAPTER                  (0)
 #define dg_configNVMS_ADAPTER                   (0)
 #define dg_configNVMS_VES                       (0)

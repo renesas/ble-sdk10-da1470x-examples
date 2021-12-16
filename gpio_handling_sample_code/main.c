@@ -26,7 +26,6 @@
 
 /* Required libraries for the target application */
 #include "platform_devices.h"
-#include "gpio_handling.h"
 
 /* Task priorities */
 #define mainGPIO_TASK_PRIORITY              ( OS_TASK_PRIORITY_NORMAL )
@@ -141,7 +140,8 @@ static bool _ad_prepare_for_sleep(void)
          * GPIO pins must be set in latch disabled state before the ARM M33 enters sleep.
          * Otherwise they may have unexpected behavior.
          */
-        app_gpio_pins_set_inactive((gpio_config *)output_gpio_cfg);
+        ad_io_configure(output_gpio_cfg, N_OUTPUTS, HW_GPIO_POWER_V33, led_status);
+        ad_io_set_pad_latch(output_gpio_cfg, N_OUTPUTS, AD_IO_PAD_LATCHES_OP_DISABLE);
 
         return true; // allow M33 to enter sleep
 
@@ -150,9 +150,8 @@ static bool _ad_prepare_for_sleep(void)
 /* Callback function triggered following a sleep cancellation cycle */
 static void _ad_sleep_canceled(void)
 {
-        /* GPIOs must be set in latch enabled state in case sleep is cancelled */
-        app_gpio_pins_set_active((gpio_config *)output_gpio_cfg, HW_GPIO_POWER_V33);
-
+        ad_io_configure(output_gpio_cfg, N_OUTPUTS, HW_GPIO_POWER_V33, led_status);
+        ad_io_set_pad_latch(output_gpio_cfg, N_OUTPUTS, AD_IO_PAD_LATCHES_OP_ENABLE);
 }
 
 /**
@@ -205,7 +204,7 @@ static void prvTemplateTask( void *pvParameters )
                  * array. Otherwise, the old status will be used at M33 wakeup.
                  */
                 led_status ^= 1;
-                output_gpio_cfg[0].high = led_status;
+
                 printf("you turn me %s baby\n", led_status?"ON":"OFF");
 
                 hw_gpio_toggle(LED1_PORT, LED1_PIN);
@@ -219,7 +218,12 @@ static void prvTemplateTask( void *pvParameters )
 static void periph_init(void)
 {
         /* GPIOs must be set in latch enabled state at M33 wakeup. */
-        app_gpio_pins_set_active((gpio_config *)output_gpio_cfg, HW_GPIO_POWER_V33);
+
+        AD_IO_ERROR ok = ad_io_configure(output_gpio_cfg, N_OUTPUTS, HW_GPIO_POWER_V33, AD_IO_CONF_ON);
+        OS_ASSERT(ok == AD_IO_ERROR_NONE);
+        ok = ad_io_set_pad_latch(output_gpio_cfg, N_OUTPUTS, AD_IO_PAD_LATCHES_OP_ENABLE);
+        OS_ASSERT(ok == AD_IO_ERROR_NONE);
+
 }
 
 /**

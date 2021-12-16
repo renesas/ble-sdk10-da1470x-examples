@@ -28,10 +28,6 @@
 #define dg_configFLASH_CONNECTED_TO             (FLASH_CONNECTED_TO_1V8F)
 #define dg_configFLASH_POWER_DOWN               (1)
 
-#define dg_configPOWER_1V8P_ACTIVE              (1)
-#define dg_configPOWER_1V8P_SLEEP               (1)
-
-
 #define dg_configUSE_SW_CURSOR                  (1)
 
 /*************************************************************************************************\
@@ -46,6 +42,7 @@
 
 #define dg_configRF_ENABLE_RECALIBRATION        (0)
 
+#define dg_configUART_ADAPTER                   (1) //workaround to get common adapters functions for GPIO
 #define dg_configFLASH_ADAPTER                  (0)
 #define dg_configNVMS_ADAPTER                   (0)
 #define dg_configNVMS_VES                       (0)
