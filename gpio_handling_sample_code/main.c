@@ -141,7 +141,7 @@ static bool _ad_prepare_for_sleep(void)
          * Otherwise they may have unexpected behavior.
          */
 
-        ad_io_set_pad_latch(output_gpio_cfg, N_OUTPUTS, AD_IO_PAD_LATCHES_OP_DISABLE);
+        ad_io_set_pad_latch(output_gpio_cfg, ARRAY_LENGTH(output_gpio_cfg), AD_IO_PAD_LATCHES_OP_DISABLE);
 
         return true; // allow M33 to enter sleep
 
@@ -150,7 +150,7 @@ static bool _ad_prepare_for_sleep(void)
 /* Callback function triggered following a sleep cancellation cycle */
 static void _ad_sleep_canceled(void)
 {
-        ad_io_set_pad_latch(output_gpio_cfg, N_OUTPUTS, AD_IO_PAD_LATCHES_OP_ENABLE);
+        ad_io_set_pad_latch(output_gpio_cfg, ARRAY_LENGTH(output_gpio_cfg), AD_IO_PAD_LATCHES_OP_ENABLE);
 }
 
 /**
@@ -206,7 +206,7 @@ static void prvTemplateTask( void *pvParameters )
 
                 printf("you turn me %s baby\n", led_status?"ON":"OFF");
 
-                ad_io_configure(output_gpio_cfg, N_OUTPUTS, HW_GPIO_POWER_V33, led_status);
+                ad_io_configure(output_gpio_cfg, ARRAY_LENGTH(output_gpio_cfg), HW_GPIO_POWER_V33, led_status);
         }
 }
 
@@ -218,10 +218,10 @@ static void periph_init(void)
 {
         /* GPIOs must be set in latch enabled state at M33 wakeup. */
 
-        AD_IO_ERROR ok = ad_io_configure(output_gpio_cfg, N_OUTPUTS, HW_GPIO_POWER_V33, AD_IO_CONF_ON);
-        OS_ASSERT(ok == AD_IO_ERROR_NONE);
-        ok = ad_io_set_pad_latch(output_gpio_cfg, N_OUTPUTS, AD_IO_PAD_LATCHES_OP_ENABLE);
-        OS_ASSERT(ok == AD_IO_ERROR_NONE);
+        AD_IO_ERROR ok = ad_io_configure(output_gpio_cfg, ARRAY_LENGTH(output_gpio_cfg), HW_GPIO_POWER_V33, AD_IO_CONF_ON);
+        OS_ASSERT(AD_IO_ERROR_NONE == ok);
+        ok = ad_io_set_pad_latch(output_gpio_cfg, ARRAY_LENGTH(output_gpio_cfg), AD_IO_PAD_LATCHES_OP_ENABLE);
+        OS_ASSERT(AD_IO_ERROR_NONE == ok);
 
 }
 

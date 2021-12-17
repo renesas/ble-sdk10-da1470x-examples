@@ -1149,12 +1149,6 @@
     	
     <storageModule moduleId="refreshScope" versionNumber="2">
         		
-        <configuration configurationName="DA1470x-00-Release_RAM">
-            			
-            <resource resourceType="PROJECT" workspacePath="/freertos_retarget"/>
-            		
-        </configuration>
-        		
         <configuration configurationName="DA1470x-00-Debug_RAM">
             			
             <resource resourceType="PROJECT" workspacePath="/freertos_retarget"/>
@@ -1162,6 +1156,12 @@
         </configuration>
         		
         <configuration configurationName="DA1470x-00-Release_QSPI">
+            			
+            <resource resourceType="PROJECT" workspacePath="/freertos_retarget"/>
+            		
+        </configuration>
+        		
+        <configuration configurationName="DA1470x-00-Release_RAM">
             			
             <resource resourceType="PROJECT" workspacePath="/freertos_retarget"/>
             		

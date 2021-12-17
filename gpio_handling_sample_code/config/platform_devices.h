@@ -46,11 +46,8 @@ __UNUSED static const ad_io_conf_t input_gpio_cfg[] = {
 
 /*
  * Output GPIO pins configuration array.
- *
- * \note: Since the elements of the array might be modified during the code execution,
- *        you should not assign the attribute 'const'. ??*/
-#define N_OUTPUTS 1
-static const ad_io_conf_t output_gpio_cfg[N_OUTPUTS] = {
+ */
+static const ad_io_conf_t output_gpio_cfg[] = {
     {
          .port =  LED1_PORT,
          .pin = LED1_PIN,
