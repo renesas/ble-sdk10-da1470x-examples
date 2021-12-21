@@ -72,6 +72,16 @@
  */
 #define dg_configWKUP_KEY_BLOCK_ENABLE          (1)
 
+//#define OUTPUT1_PORT       (HW_GPIO_PORT_1)
+//#define OUTPUT1_PIN        (HW_GPIO_PIN_30)
+//#define OUTPUT1_MODE       (HW_GPIO_MODE_OUTPUT)
+//#define OUTPUT1_FUNC       (HW_GPIO_FUNC_GPIO)
+//
+//#define OUTPUT2_PORT       (HW_GPIO_PORT_1)
+//#define OUTPUT2_PIN        (HW_GPIO_PIN_31)
+//#define OUTPUT2_MODE       (HW_GPIO_MODE_OUTPUT)
+//#define OUTPUT2_FUNC       (HW_GPIO_FUNC_GPIO)
+
 /* Include bsp default values */
 #include "bsp_defaults.h"
 /* Include middleware default values */

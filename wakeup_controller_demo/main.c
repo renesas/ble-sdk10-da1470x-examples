@@ -37,7 +37,8 @@
 /******** Notification Bitmasks ********/
 #define WKUP_KEY_PRESS_EVENT_NOTIF              (1 << 2)
 #define WKUP_KEY_RELEASE_EVENT_NOTIF            (1 << 3)
-#define WKUP_GPIO_P1_EVENT_NOTIF                (1 << 4)
+#define WKUP_GPIO_P1_EVENT_NOTIF_LOW            (1 << 4)
+#define WKUP_GPIO_P1_EVENT_NOTIF_HIGH           (1 << 5)
 
 /*
  * Macro used for selecting the trigger (active) of the WKUP controller.
@@ -50,11 +51,11 @@
  *
  **/
 #if (dg_configWKUP_KEY_BLOCK_ENABLE)
-#define WKUP_TRIGGER_EDGE                       (0)
+#define WKUP_TRIGGER_STATE                      (0)
 #endif
 
 #if (dg_configWKUP_GPIO_P1_BLOCK_ENABLE)
-#define GPIO_TRIGGER_LEVEL                      (0)
+#define GPIO_TRIGGER_STATE                      (0)
 /*
  * Macro used for selecting if the wake-up trigger is edge or level sensitive
  *
@@ -62,10 +63,6 @@
  * 1 -> The trigger is edge sensitive
  */
 #define GPIO_TRIGGER_SENSITIVITY                (1)
-
-#define GPIO_TRIGGER                            (GPIO_TRIGGER_SENSITIVITY) ?                                                  \
-                                                ((GPIO_TRIGGER_LEVEL) ? HW_WKUP_TRIG_EDGE_HI : HW_WKUP_TRIG_EDGE_LO) :        \
-                                                ((GPIO_TRIGGER_LEVEL) ? HW_WKUP_TRIG_LEVEL_HI : HW_WKUP_TRIG_LEVEL_LO)
 #endif
 
 /********************************* Custom wake up settings ************************************/
@@ -73,7 +70,7 @@ wkup_config pin_wkup_conf = {
         .debounce = 10,
         .pin_wkup_state[KEY1_PORT] = ( 1 << KEY1_PIN ),
         .pin_gpio_state[KEY1_PORT] = ( 1 << KEY1_PIN) | (1 << KEY2_PIN ),
-        .pin_trigger[KEY1_PORT]    = ( WKUP_TRIGGER_EDGE << KEY1_PIN) | (GPIO_TRIGGER_LEVEL << KEY2_PIN ),
+        .pin_trigger[KEY1_PORT]    = ( WKUP_TRIGGER_STATE << KEY1_PIN) | (GPIO_TRIGGER_STATE << KEY2_PIN ),
         .gpio_sense[KEY1_PORT]     = ( GPIO_TRIGGER_SENSITIVITY << KEY1_PIN) | (GPIO_TRIGGER_SENSITIVITY << KEY2_PIN ),
 };
 /********************************************************************************************/
@@ -101,14 +98,17 @@ void wkup_deb_interrupt_cb(void)
         /* Mask the last bit from the enumeration, 0 stands for low 1 stands for high state */
         trigger = hw_wkup_get_trigger(KEY1_PORT, KEY1_PIN) & (1 << 0);
 
-        event = ((trigger == WKUP_TRIGGER_EDGE) ? WKUP_KEY_PRESS_EVENT_NOTIF : WKUP_KEY_RELEASE_EVENT_NOTIF);
+        event = ((trigger == WKUP_TRIGGER_STATE) ? WKUP_KEY_PRESS_EVENT_NOTIF : WKUP_KEY_RELEASE_EVENT_NOTIF);
 
-        pin_wkup_conf.pin_trigger[KEY1_PORT] = (!trigger<<KEY1_PIN) | (GPIO_TRIGGER_LEVEL<<KEY2_PIN);
+        pin_wkup_conf.pin_trigger[KEY1_PORT] = (!trigger<<KEY1_PIN) | (GPIO_TRIGGER_STATE<<KEY2_PIN);
 
         hw_wkup_configure(&pin_wkup_conf);
 
-//        /* Change the trigger polarity so that the WKUP controller is triggered on the opposite edge */
-//        hw_wkup_set_trigger(KEY1_PORT, KEY1_PIN, trigger ? HW_WKUP_TRIG_LEVEL_LO_DEB : HW_WKUP_TRIG_LEVEL_HI_DEB);
+//        HW_GPIO_PAD_LATCH_ENABLE(OUTPUT2);
+//        hw_gpio_toggle(OUTPUT2_PORT, OUTPUT2_PIN);
+//        hw_gpio_toggle(OUTPUT2_PORT, OUTPUT2_PIN);
+//        /* Lock the mode of the target GPIO pin */
+//        HW_GPIO_PAD_LATCH_DISABLE(OUTPUT2);
 
         OS_TASK_NOTIFY_FROM_ISR(task_h, event, OS_NOTIFY_SET_BITS);
 }
@@ -117,12 +117,24 @@ void wkup_deb_interrupt_cb(void)
 #if (dg_configWKUP_GPIO_P1_BLOCK_ENABLE)
 void wkup_gpio_interrupt_cb(void)
 {
-        uint32_t status;
+        uint32_t status, event = 0;
+
         /* Clear the WKUP interrupt flag */
         hw_wkup_reset_key_interrupt();
 
-        /* Get the status of the selected port on last wakeup event. */
+        /* Get the status and polarity of the selected port on last wakeup event. */
         status = hw_wkup_get_gpio_status(KEY2_PORT);
+
+        if( status & (1 << KEY1_PIN) )
+                event = (hw_wkup_get_trigger(KEY1_PORT, KEY1_PIN) & (1 << 0)) ? WKUP_GPIO_P1_EVENT_NOTIF_HIGH : WKUP_GPIO_P1_EVENT_NOTIF_LOW;
+        else if( status & (1 << KEY2_PIN) )
+                event = (hw_wkup_get_trigger(KEY2_PORT, KEY2_PIN) & (1 << 0)) ? WKUP_GPIO_P1_EVENT_NOTIF_HIGH : WKUP_GPIO_P1_EVENT_NOTIF_LOW;
+
+//        HW_GPIO_PAD_LATCH_ENABLE(OUTPUT1);
+//        hw_gpio_toggle(OUTPUT1_PORT, OUTPUT1_PIN);
+//        hw_gpio_toggle(OUTPUT1_PORT, OUTPUT1_PIN);
+//        /* Lock the mode of the target GPIO pin */
+//        HW_GPIO_PAD_LATCH_DISABLE(OUTPUT1);
 
         /*
          * This function MUST be called by any GPIO interrupt handler,
@@ -130,7 +142,7 @@ void wkup_gpio_interrupt_cb(void)
          */
         hw_wkup_clear_gpio_status(KEY2_PORT, status);
 
-        OS_TASK_NOTIFY_FROM_ISR(task_h, WKUP_GPIO_P1_EVENT_NOTIF, OS_NOTIFY_SET_BITS);
+        OS_TASK_NOTIFY_FROM_ISR(task_h, event, OS_NOTIFY_SET_BITS);
 }
 #endif
 
@@ -143,32 +155,18 @@ static void wkup_init(void)
 
 #if (dg_configWKUP_KEY_BLOCK_ENABLE)
         /*
-         * Set debounce time expressed in ms. Maximum allowable value is 63 ms.
-         * A value set to 0 disables the debounce functionality.
-         */
-        //hw_wkup_set_key_debounce_time(10);
-
-        /*
          * Enable interrupts produced by the KEY block of the wakeup controller (debounce
          * circuitry) and register a callback function to hit following a KEY event.
          */
-        hw_wkup_register_key_interrupt(wkup_deb_interrupt_cb, 1);
-
-
-        /*
-         * Set the polarity (rising/falling edge) that triggers the WKUP controller.
-         *
-         * \note The polarity is applied both to KEY and GPIO blocks of the controller
-         *
-         */
-        //hw_wkup_set_trigger(KEY1_PORT, KEY1_PIN, ( WKUP_TRIGGER_EDGE ? HW_WKUP_TRIG_LEVEL_HI_DEB : HW_WKUP_TRIG_LEVEL_LO_DEB ) );
+        hw_wkup_register_key_interrupt(wkup_deb_interrupt_cb, 2);
 #endif
 
 #if (dg_configWKUP_GPIO_P1_BLOCK_ENABLE)
-
+        /*
+         * Enable interrupts produced by the GPIO block of the wakeup controller
+         * and register a callback function to hit following a KEY event.
+         */
         hw_wkup_register_gpio_p1_interrupt(wkup_gpio_interrupt_cb, 1);
-
-        //hw_wkup_set_trigger(KEY2_PORT, KEY2_PIN, GPIO_TRIGGER);
 #endif
         /* Enable interrupts of WKUP controller */
         hw_wkup_enable_key_irq();
@@ -272,8 +270,12 @@ static OS_TASK_FUNCTION(extWakeUpTriggerTask, pvParameters)
                         printf("Key release occurred\n\r");
                 }
 
-                if(ulNotifiedValue & WKUP_GPIO_P1_EVENT_NOTIF) {
-                        printf("GPIO pulse occurred\n\r");
+                if(ulNotifiedValue & WKUP_GPIO_P1_EVENT_NOTIF_LOW) {
+                        printf("GPIO pulse low occurred\n\r");
+                }
+
+                if(ulNotifiedValue & WKUP_GPIO_P1_EVENT_NOTIF_HIGH) {
+                        printf("GPIO pulse high occurred\n\r");
                 }
 
                 fflush(stdout);
@@ -287,6 +289,15 @@ static OS_TASK_FUNCTION(extWakeUpTriggerTask, pvParameters)
  */
 static void periph_init(void)
 {
+//        HW_GPIO_PAD_LATCH_ENABLE(OUTPUT1);
+//        HW_GPIO_SET_PIN_FUNCTION(OUTPUT1);
+//        /* Lock the mode of the target GPIO pin */
+//        HW_GPIO_PAD_LATCH_DISABLE(OUTPUT1);
+//
+//        HW_GPIO_PAD_LATCH_ENABLE(OUTPUT2);
+//        HW_GPIO_SET_PIN_FUNCTION(OUTPUT2);
+//        /* Lock the mode of the target GPIO pin */
+//        HW_GPIO_PAD_LATCH_DISABLE(OUTPUT2);
 }
 
 /**
@@ -355,12 +366,14 @@ static void prvSetupHardware( void )
  * Wouldn't be valid to activate both key PDC entry and GPIO on another pin ?
  */
 #if (dg_configWKUP_GPIO_P1_BLOCK_ENABLE)
-        /* Configure the KEY1 push button on Pro DevKit */
+        /* Configure the KEY2 push button on Pro DevKit */
         HW_GPIO_SET_PIN_FUNCTION(KEY2);
         HW_GPIO_PAD_LATCH_ENABLE(KEY2);
         /* Lock the mode of the target GPIO pin */
         HW_GPIO_PAD_LATCH_DISABLE(KEY2);
 #endif
+
+
 
         /* Disable the COM power domain after handling the GPIO pins */
         hw_sys_pd_com_disable();
