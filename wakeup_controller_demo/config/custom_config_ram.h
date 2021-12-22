@@ -62,7 +62,7 @@
  * 1 --> Enable the KEY block as well as debounced IO IRQs
  * 0 --> Disable the KEY block.
  */
-#define dg_configWKUP_GPIO_P1_BLOCK_ENABLE      (1)
+#define dg_configWKUP_GPIO_P1_BLOCK_ENABLE      (0)
 
 /*
  * Enable/disable the GPIO sub block of the WKUP controller. Valid values are:
@@ -71,16 +71,6 @@
  * 0 --> Disable the GPIO block.
  */
 #define dg_configWKUP_KEY_BLOCK_ENABLE          (1)
-
-//#define OUTPUT1_PORT       (HW_GPIO_PORT_1)
-//#define OUTPUT1_PIN        (HW_GPIO_PIN_30)
-//#define OUTPUT1_MODE       (HW_GPIO_MODE_OUTPUT)
-//#define OUTPUT1_FUNC       (HW_GPIO_FUNC_GPIO)
-//
-//#define OUTPUT2_PORT       (HW_GPIO_PORT_1)
-//#define OUTPUT2_PIN        (HW_GPIO_PIN_31)
-//#define OUTPUT2_MODE       (HW_GPIO_MODE_OUTPUT)
-//#define OUTPUT2_FUNC       (HW_GPIO_FUNC_GPIO)
 
 /* Include bsp default values */
 #include "bsp_defaults.h"

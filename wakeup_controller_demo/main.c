@@ -50,11 +50,11 @@
  *       (the pin is connected to a pull-down resistor)
  *
  **/
-#if (dg_configWKUP_KEY_BLOCK_ENABLE)
+//#if (dg_configWKUP_KEY_BLOCK_ENABLE)
 #define WKUP_TRIGGER_STATE                      (0)
-#endif
+//#endif
 
-#if (dg_configWKUP_GPIO_P1_BLOCK_ENABLE)
+//#if (dg_configWKUP_GPIO_P1_BLOCK_ENABLE)
 #define GPIO_TRIGGER_STATE                      (0)
 /*
  * Macro used for selecting if the wake-up trigger is edge or level sensitive
@@ -63,15 +63,27 @@
  * 1 -> The trigger is edge sensitive
  */
 #define GPIO_TRIGGER_SENSITIVITY                (1)
+//#endif
+
+#if (dg_configWKUP_KEY_BLOCK_ENABLE)
+#define WKUP_TRIGGER_ENABLED                    (1)
+#else
+#define WKUP_TRIGGER_ENABLED                    (0)
+#endif
+
+#if (dg_configWKUP_GPIO_P1_BLOCK_ENABLE)
+#define GPIO_TRIGGER_ENABLED                    (1)
+#else
+#define GPIO_TRIGGER_ENABLED                    (0)
 #endif
 
 /********************************* Custom wake up settings ************************************/
 wkup_config pin_wkup_conf = {
         .debounce = 10,
-        .pin_wkup_state[KEY1_PORT] = ( 1 << KEY1_PIN ),
-        .pin_gpio_state[KEY1_PORT] = ( 1 << KEY1_PIN) | (1 << KEY2_PIN ),
-        .pin_trigger[KEY1_PORT]    = ( WKUP_TRIGGER_STATE << KEY1_PIN) | (GPIO_TRIGGER_STATE << KEY2_PIN ),
-        .gpio_sense[KEY1_PORT]     = ( GPIO_TRIGGER_SENSITIVITY << KEY1_PIN) | (GPIO_TRIGGER_SENSITIVITY << KEY2_PIN ),
+        .pin_wkup_state[HW_GPIO_PORT_1] = ( WKUP_TRIGGER_ENABLED << KEY1_PIN ),
+        .pin_gpio_state[HW_GPIO_PORT_1] = ( (WKUP_TRIGGER_ENABLED | GPIO_TRIGGER_ENABLED) << KEY1_PIN) | (GPIO_TRIGGER_ENABLED << KEY2_PIN ),
+        .pin_trigger[HW_GPIO_PORT_1]    = ( WKUP_TRIGGER_STATE << KEY1_PIN) | (GPIO_TRIGGER_STATE << KEY2_PIN ),
+        .gpio_sense[HW_GPIO_PORT_1]     = ( GPIO_TRIGGER_SENSITIVITY << KEY1_PIN) | (GPIO_TRIGGER_SENSITIVITY << KEY2_PIN ),
 };
 /********************************************************************************************/
 
@@ -100,15 +112,9 @@ void wkup_deb_interrupt_cb(void)
 
         event = ((trigger == WKUP_TRIGGER_STATE) ? WKUP_KEY_PRESS_EVENT_NOTIF : WKUP_KEY_RELEASE_EVENT_NOTIF);
 
-        pin_wkup_conf.pin_trigger[KEY1_PORT] = (!trigger<<KEY1_PIN) | (GPIO_TRIGGER_STATE<<KEY2_PIN);
+        pin_wkup_conf.pin_trigger[KEY1_PORT] = (!trigger << KEY1_PIN) | (GPIO_TRIGGER_STATE << KEY2_PIN);
 
         hw_wkup_configure(&pin_wkup_conf);
-
-//        HW_GPIO_PAD_LATCH_ENABLE(OUTPUT2);
-//        hw_gpio_toggle(OUTPUT2_PORT, OUTPUT2_PIN);
-//        hw_gpio_toggle(OUTPUT2_PORT, OUTPUT2_PIN);
-//        /* Lock the mode of the target GPIO pin */
-//        HW_GPIO_PAD_LATCH_DISABLE(OUTPUT2);
 
         OS_TASK_NOTIFY_FROM_ISR(task_h, event, OS_NOTIFY_SET_BITS);
 }
@@ -123,24 +129,18 @@ void wkup_gpio_interrupt_cb(void)
         hw_wkup_reset_key_interrupt();
 
         /* Get the status and polarity of the selected port on last wakeup event. */
-        status = hw_wkup_get_gpio_status(KEY2_PORT);
+        status = hw_wkup_get_gpio_status(HW_GPIO_PORT_1);
 
         if( status & (1 << KEY1_PIN) )
                 event = (hw_wkup_get_trigger(KEY1_PORT, KEY1_PIN) & (1 << 0)) ? WKUP_GPIO_P1_EVENT_NOTIF_HIGH : WKUP_GPIO_P1_EVENT_NOTIF_LOW;
         else if( status & (1 << KEY2_PIN) )
                 event = (hw_wkup_get_trigger(KEY2_PORT, KEY2_PIN) & (1 << 0)) ? WKUP_GPIO_P1_EVENT_NOTIF_HIGH : WKUP_GPIO_P1_EVENT_NOTIF_LOW;
 
-//        HW_GPIO_PAD_LATCH_ENABLE(OUTPUT1);
-//        hw_gpio_toggle(OUTPUT1_PORT, OUTPUT1_PIN);
-//        hw_gpio_toggle(OUTPUT1_PORT, OUTPUT1_PIN);
-//        /* Lock the mode of the target GPIO pin */
-//        HW_GPIO_PAD_LATCH_DISABLE(OUTPUT1);
-
         /*
          * This function MUST be called by any GPIO interrupt handler,
          * to clear the interrupt latch status.
          */
-        hw_wkup_clear_gpio_status(KEY2_PORT, status);
+        hw_wkup_clear_gpio_status(HW_GPIO_PORT_1, status);
 
         OS_TASK_NOTIFY_FROM_ISR(task_h, event, OS_NOTIFY_SET_BITS);
 }
@@ -289,15 +289,6 @@ static OS_TASK_FUNCTION(extWakeUpTriggerTask, pvParameters)
  */
 static void periph_init(void)
 {
-//        HW_GPIO_PAD_LATCH_ENABLE(OUTPUT1);
-//        HW_GPIO_SET_PIN_FUNCTION(OUTPUT1);
-//        /* Lock the mode of the target GPIO pin */
-//        HW_GPIO_PAD_LATCH_DISABLE(OUTPUT1);
-//
-//        HW_GPIO_PAD_LATCH_ENABLE(OUTPUT2);
-//        HW_GPIO_SET_PIN_FUNCTION(OUTPUT2);
-//        /* Lock the mode of the target GPIO pin */
-//        HW_GPIO_PAD_LATCH_DISABLE(OUTPUT2);
 }
 
 /**
@@ -328,20 +319,21 @@ static void prvSetupHardware( void )
         hw_pdc_set_pending(pdc_wkup_combo_id);
         hw_pdc_acknowledge(pdc_wkup_combo_id);
 #endif
-        pdc_wkup_combo_id = hw_pdc_add_entry(HW_PDC_LUT_ENTRY_VAL(
-                                                KEY1_PORT,
-                                                KEY1_PIN,
-                                                HW_PDC_MASTER_CM33, 0));
-        OS_ASSERT(pdc_wkup_combo_id != HW_PDC_INVALID_LUT_INDEX);
-
-        hw_pdc_set_pending(pdc_wkup_combo_id);
-        hw_pdc_acknowledge(pdc_wkup_combo_id);
 #endif
 
 #if (dg_configWKUP_GPIO_P1_BLOCK_ENABLE)
         pdc_wkup_combo_id = hw_pdc_add_entry(HW_PDC_LUT_ENTRY_VAL(
                                                 KEY2_PORT,
                                                 KEY2_PIN,
+                                                HW_PDC_MASTER_CM33, 0));
+        OS_ASSERT(pdc_wkup_combo_id != HW_PDC_INVALID_LUT_INDEX);
+
+        hw_pdc_set_pending(pdc_wkup_combo_id);
+        hw_pdc_acknowledge(pdc_wkup_combo_id);
+
+        pdc_wkup_combo_id = hw_pdc_add_entry(HW_PDC_LUT_ENTRY_VAL(
+                                                KEY1_PORT,
+                                                KEY1_PIN,
                                                 HW_PDC_MASTER_CM33, 0));
         OS_ASSERT(pdc_wkup_combo_id != HW_PDC_INVALID_LUT_INDEX);
 
@@ -355,13 +347,11 @@ static void prvSetupHardware( void )
         /* Enable the COM power domain before handling any GPIO pin */
         hw_sys_pd_com_enable();
 
-#if (dg_configWKUP_KEY_BLOCK_ENABLE)
         /* Configure the KEY1 push button on Pro DevKit */
         HW_GPIO_SET_PIN_FUNCTION(KEY1);
         HW_GPIO_PAD_LATCH_ENABLE(KEY1);
         /* Lock the mode of the target GPIO pin */
         HW_GPIO_PAD_LATCH_DISABLE(KEY1);
-#endif
 /*
  * Wouldn't be valid to activate both key PDC entry and GPIO on another pin ?
  */
@@ -373,11 +363,8 @@ static void prvSetupHardware( void )
         HW_GPIO_PAD_LATCH_DISABLE(KEY2);
 #endif
 
-
-
         /* Disable the COM power domain after handling the GPIO pins */
         hw_sys_pd_com_disable();
-
 }
 
 /**

@@ -57,7 +57,7 @@
  * 1 --> Enable the KEY block as well as debounced IO IRQs
  * 0 --> Disable the KEY block.
  */
-#define dg_configWKUP_GPIO_P1_BLOCK_ENABLE      (1)
+#define dg_configWKUP_GPIO_P1_BLOCK_ENABLE      (0)
 
 /*
  * Enable/disable the GPIO sub block of the WKUP controller. Valid values are:
