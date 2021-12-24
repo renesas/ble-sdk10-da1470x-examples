@@ -138,7 +138,7 @@ static bool _ad_prepare_for_sleep(void)
 {
         /*
          * GPIO pins must be set in latch disabled state before the ARM M33 enters sleep.
-         * Otherwise they may have unexpected behavior.
+         * Otherwise, pads logic will reset to default which for the majority of the I/O pins is Input Pull Down.
          */
 
         ad_io_set_pad_latch(output_gpio_cfg, ARRAY_LENGTH(output_gpio_cfg), AD_IO_PAD_LATCHES_OP_DISABLE);
