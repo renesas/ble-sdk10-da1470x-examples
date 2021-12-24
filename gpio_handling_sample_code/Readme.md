@@ -9,8 +9,8 @@ User can switch between the two mechanisms using the `GPIO_HANDLING_DYNAMICALLY`
 ### HW & SW Configurations
 
 - **Hardware Configurations**
-    - This example runs on a DA1487x Bluetooth Smart SoC.
-    - A DA1487x Pro Development Kit is needed for this example.
+    - This example runs on a DA1470x Bluetooth Smart SoC.
+    - A DA1470x Pro Development Kit is needed for this example.
 - **Software Configurations**
     - Download the latest SDK version for the DA1487x family of devices (10.0.10.x)
     - **SEGGER's J-Link** tools should be downloaded and installed.
@@ -25,7 +25,7 @@ User can switch between the two mechanisms using the `GPIO_HANDLING_DYNAMICALLY`
 - Connect the target device to your host PC.
 - Compile the code (either in Release or Debug mode) and load it into the chip.
 - Open a serial terminal (115200/8 - N - 1)
-- Press the reset button on DA1487x daughterboard to start executing the application.
+- Press the reset button on DA1470x daughterboard to start executing the application.
 
 - Monitor the GPIO P0_22 to verify that it toggles every one second. 
 

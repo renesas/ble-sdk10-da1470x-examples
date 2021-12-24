@@ -38,10 +38,63 @@ static void prvSetupHardware( void );
 /*
  * Task functions .
  */
-static void prvTemplateTask( void *pvParameters );
+static void gpio_task( void *pvParameters );
 
 
 static OS_TASK xHandle;
+
+
+/* Callback function triggered following a sleep cycle */
+static bool _ad_prepare_for_sleep(void)
+{
+        /*
+         * GPIO pins must be set in latch disabled state before the ARM M33 enters sleep.
+         * Otherwise, pads logic will reset to default which for the majority of the I/O pins is Input Pull Down.
+         */
+
+        ad_io_set_pad_latch(output_gpio_cfg, ARRAY_LENGTH(output_gpio_cfg), AD_IO_PAD_LATCHES_OP_DISABLE);
+
+        return true; // allow M33 to enter sleep
+
+}
+
+/* Callback function triggered following a sleep cancellation cycle */
+static void _ad_sleep_canceled(void)
+{
+        ad_io_set_pad_latch(output_gpio_cfg, ARRAY_LENGTH(output_gpio_cfg), AD_IO_PAD_LATCHES_OP_ENABLE);
+}
+
+/*
+ * Register user-defined callback functions to Power Manager (PM)
+ */
+static const adapter_call_backs_t ad_pm_call_backs = {
+
+        /* This callback function is fired when a sleep cycle is issued. */
+        .ad_prepare_for_sleep = _ad_prepare_for_sleep,
+
+        /* This callback function is fired when a wakeup cycle is issued.  */
+        .ad_wake_up_ind       = NULL,
+
+        /*
+         * This callback function is triggered in case the system was about
+         * to enter sleep but the sleep cycle was eventually aborted.
+         */
+        .ad_sleep_canceled    = _ad_sleep_canceled,
+
+        /*
+         * This callback function is triggered when the XTAL32M crystal
+         * settles (after a wakeup cycle).
+         */
+        .ad_xtalm_ready_ind   = NULL,
+
+        /*
+         * This parameter should be used for declaring extra time
+         * required for the system to stay awake (before entering
+         * sleep).
+         */
+        .ad_sleep_preparation_time = 0,
+};
+
 
 static void system_init( void *pvParameters )
 {
@@ -78,12 +131,15 @@ static void system_init( void *pvParameters )
         /* Set the desired wakeup mode. */
         pm_set_sys_wakeup_mode(pm_sys_wakeup_mode_fast);
 
-
+        /*
+        * Register callback functions to Power Manager (PM).
+        * */
+        pm_register_adapter(&ad_pm_call_backs);
 
         /* Task responsible for handling GPIO pins */
         OS_TASK_CREATE( "GPIO_Handling",                /* The text name assigned to the task, for
                                                            debug only; not used by the kernel. */
-                        prvTemplateTask,                /* The function that implements the task. */
+                        gpio_task,                /* The function that implements the task. */
                         NULL,                           /* The parameter passed to the task. */
                         2 * configMINIMAL_STACK_SIZE * OS_STACK_WORD_SIZE,
                                                         /* The number of bytes to allocate to the
@@ -97,7 +153,7 @@ static void system_init( void *pvParameters )
 }
 
 /**
- * @brief Template main creates a SysInit task, which creates a GPIO handling task
+ * @brief main creates a SysInit task, which creates a GPIO handling task
  */
 int main( void )
 {
@@ -133,66 +189,12 @@ int main( void )
 /* Variable used for storing LED1 status */
 __RETAINED_RW static bool led_status = 0;
 
-/* Callback function triggered following a sleep cycle */
-static bool _ad_prepare_for_sleep(void)
-{
-        /*
-         * GPIO pins must be set in latch disabled state before the ARM M33 enters sleep.
-         * Otherwise, pads logic will reset to default which for the majority of the I/O pins is Input Pull Down.
-         */
-
-        ad_io_set_pad_latch(output_gpio_cfg, ARRAY_LENGTH(output_gpio_cfg), AD_IO_PAD_LATCHES_OP_DISABLE);
-
-        return true; // allow M33 to enter sleep
-
-}
-
-/* Callback function triggered following a sleep cancellation cycle */
-static void _ad_sleep_canceled(void)
-{
-        ad_io_set_pad_latch(output_gpio_cfg, ARRAY_LENGTH(output_gpio_cfg), AD_IO_PAD_LATCHES_OP_ENABLE);
-}
-
 /**
  * @brief GPIO handling task
  */
-static void prvTemplateTask( void *pvParameters )
+static void gpio_task( void *pvParameters )
 {
-        /*
-         * Register user-defined callback functions to Power Manager (PM)
-         */
-        const adapter_call_backs_t ad_pm_call_backs = {
 
-                /* This callback function is fired when a sleep cycle is issued. */
-                .ad_prepare_for_sleep = _ad_prepare_for_sleep,
-
-                /* This callback function is fired when a wakeup cycle is issued.  */
-                .ad_wake_up_ind       = NULL,
-
-                /*
-                 * This callback function is triggered in case the system was about
-                 * to enter sleep but the sleep cycle was eventually aborted.
-                 */
-                .ad_sleep_canceled    = _ad_sleep_canceled,
-
-                /*
-                 * This callback function is triggered when the XTAL32M crystal
-                 * settles (after a wakeup cycle).
-                 */
-                .ad_xtalm_ready_ind   = NULL,
-
-                /*
-                 * This parameter should be used for declaring extra time
-                 * required for the system to stay awake (before entering
-                 * sleep).
-                 */
-                .ad_sleep_preparation_time = 0,
-        };
-
-        /*
-         * Register callback functions to Power Manager (PM).
-         */
-        pm_register_adapter(&ad_pm_call_backs);
         for ( ;; ) {
 
                 /* Block task execution for 1 second (just to allow the system to enter sleep). */
@@ -216,13 +218,12 @@ static void prvTemplateTask( void *pvParameters )
  */
 static void periph_init(void)
 {
-        /* GPIOs must be set in latch enabled state at M33 wakeup. */
 
-        AD_IO_ERROR ok = ad_io_configure(output_gpio_cfg, ARRAY_LENGTH(output_gpio_cfg), HW_GPIO_POWER_V33, AD_IO_CONF_ON);
+        /*
+         * Initialize GPIOs in latch enabled state and check for sane configuration.
+         * */
+        AD_IO_ERROR ok = ad_io_set_pad_latch(output_gpio_cfg, ARRAY_LENGTH(output_gpio_cfg), AD_IO_PAD_LATCHES_OP_ENABLE);
         OS_ASSERT(AD_IO_ERROR_NONE == ok);
-        ok = ad_io_set_pad_latch(output_gpio_cfg, ARRAY_LENGTH(output_gpio_cfg), AD_IO_PAD_LATCHES_OP_ENABLE);
-        OS_ASSERT(AD_IO_ERROR_NONE == ok);
-
 }
 
 /**
@@ -230,7 +231,6 @@ static void periph_init(void)
  */
 static void prvSetupHardware( void )
 {
-
         /* Init hardware */
         pm_system_init(periph_init);
 
