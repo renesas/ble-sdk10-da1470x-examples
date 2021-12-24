@@ -50,12 +50,9 @@
  *       (the pin is connected to a pull-down resistor)
  *
  **/
-//#if (dg_configWKUP_KEY_BLOCK_ENABLE)
-#define WKUP_TRIGGER_STATE                      (0)
-//#endif
+#define WKUP_TRIGGER_STATE                      (0)     // State for KEY interrupt
 
-//#if (dg_configWKUP_GPIO_P1_BLOCK_ENABLE)
-#define GPIO_TRIGGER_STATE                      (0)
+#define GPIO_TRIGGER_STATE                      (0)     // State for GPIO interrupt
 /*
  * Macro used for selecting if the wake-up trigger is edge or level sensitive
  *
@@ -63,7 +60,6 @@
  * 1 -> The trigger is edge sensitive
  */
 #define GPIO_TRIGGER_SENSITIVITY                (1)
-//#endif
 
 #if (dg_configWKUP_KEY_BLOCK_ENABLE)
 #define WKUP_TRIGGER_ENABLED                    (1)
@@ -195,7 +191,6 @@ static OS_TASK_FUNCTION(system_init, pvParameters)
         /* Set the desired wakeup mode. */
         pm_set_sys_wakeup_mode(pm_sys_wakeup_mode_normal);
 
-        /* Start main task here (text menu available via UART1 to control application) */
         OS_TASK_CREATE( "ExternalWakeUp",            /* The text name assigned to the task, for
                                                            debug only; not used by the kernel. */
                         extWakeUpTriggerTask,                /* The function that implements the task. */
