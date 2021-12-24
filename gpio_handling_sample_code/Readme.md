@@ -12,7 +12,7 @@ User can switch between the two mechanisms using the `GPIO_HANDLING_DYNAMICALLY`
     - This example runs on a DA1470x Bluetooth Smart SoC.
     - A DA1470x Pro Development Kit is needed for this example.
 - **Software Configurations**
-    - Download the latest SDK version for the DA1487x family of devices (10.0.10.x)
+    - Download the latest SDK version for the DA1470x family of devices (10.0.10.x)
     - **SEGGER's J-Link** tools should be downloaded and installed.
 
 
