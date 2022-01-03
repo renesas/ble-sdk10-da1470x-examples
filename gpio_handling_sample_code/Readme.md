@@ -3,7 +3,6 @@
 The GPIO peripheral block is powered by the MEM power domain (PD_MEM) and thus, it it is always enabled during M33 runtime.
 GPIO Pins must be set to latch disabled state before the ARM M33 enters sleep and activated at M33 wakeup. 
 Please note that the developer does not have to control the GPIO pins used by adapters (e.g. I2C pins). 
-User can switch between the two mechanisms using the `GPIO_HANDLING_DYNAMICALLY` macro in `main.c` file. 
 
 ### HW & SW Configurations
 
