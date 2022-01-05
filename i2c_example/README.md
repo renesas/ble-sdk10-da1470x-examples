@@ -19,8 +19,8 @@ Both request and response are printed on the UART terminal by the I2C master.
 ## Requirements
 * **Hardware configuration**
 
-    - This example runs on the DA1469x Bluetooth Smart SoC devices.
-    - The DA1469x Pro Development kit is needed for this example.
+    - This example runs on the DA1470x Bluetooth Smart SoC devices.
+    - The DA1470x Pro Development kit is needed for this example.
     - Connect the Development kit to the host computer.
 
 * **UART terminal with the following settings is needed to observe the master task
@@ -37,11 +37,11 @@ printouts**
 * **The following wiring/pairs (loopback wiring from MASTER to SLAVE) are needed 
 before starting the app. The pins settings are localized in `peripheral_setup.h` file**
 
-| DA1469x     |             |
+| DA1470x     |             |
 |:-----------:|:-----------:|
 | Master      | Slave       |
-| P0_31 (SDA) | P0_19  (SDA) |
-| P0_30 (SCL) | P0_18  (SCL) |
+| P0_11 (SDA) | P0_21  (SDA) |
+| P0_12 (SCL) | P0_22  (SCL) |
 
                                     MASTER          SLAVE (loopback) 
                                      |  |           |  |             
@@ -52,8 +52,8 @@ before starting the app. The pins settings are localized in `peripheral_setup.h`
 
 * **Software configuration**
   - This example requires:
-  - Smartsnippets Studio V2.0.14 or greater.
-  - SDK 10.0.10.118
+  - Smartsnippets Studio V2.0.16 or greater.
+  - SDK 10.0.10.x
   - **SEGGER J-Link** tools should be downloaded and installed.
 
 ## Installation procedure
@@ -81,10 +81,10 @@ The following file structure will be created:
 
 The template contains build configurations for executing it from RAM or QSPI. 
 
-- `DA1469X-00-Debug_RAM`. The project is built to be run from RAM. The executable is built with debug (-Og) information.
-- `DA1469X-00-Debug_QSPI`. The project is built to be run from QSP. The executable is built with debug (-Og) information.
-- `DA1469X-00-Release_RAM`. The project is built to be run from RAM. The executable is built with no debug information and size optimization (-Os).
-- `DA1469X-00-Release_QSPI`. The project is built to be run from QSPI. The executable is built with no debug information and size optimization (-Os).
+- `DA1470X-00-Debug_RAM`. The project is built to be run from RAM. The executable is built with debug (-Og) information.
+- `DA1470X-00-Debug_QSPI`. The project is built to be run from QSP. The executable is built with debug (-Og) information.
+- `DA1470X-00-Release_RAM`. The project is built to be run from RAM. The executable is built with no debug information and size optimization (-Os).
+- `DA1470X-00-Release_QSPI`. The project is built to be run from QSPI. The executable is built with no debug information and size optimization (-Os).
 
 ## Dependencies / Considerations
 - This project can not be shared outside Dialog before checking if the customer has signed the SLA. 
@@ -94,7 +94,7 @@ The template contains build configurations for executing it from RAM or QSPI.
 
 **************************************************************************************
 
- Copyright (c) 2020 Dialog Semiconductor. All rights reserved.
+ Copyright (c) 2022 Dialog Semiconductor. All rights reserved.
 
  This software ("Software") is owned by Dialog Semiconductor. By using this Software
  you agree that Dialog Semiconductor retains all intellectual property and proprietary

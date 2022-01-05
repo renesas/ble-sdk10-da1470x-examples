@@ -5,7 +5,7 @@
  *
  * @brief I2C request response example application.
  *
- * Copyright (C) 2020 Dialog Semiconductor.
+ * Copyright (C) 2022 Dialog Semiconductor.
  * This computer program includes Confidential, Proprietary Information
  * of Dialog Semiconductor. All Rights Reserved.
  *
@@ -64,12 +64,12 @@ static void system_init( void *pvParameters )
         retarget_init();
 #endif
         /* Set the desired sleep mode. */
-        pm_sleep_mode_set(pm_mode_active);
+        pm_sleep_mode_set(pm_mode_extended_sleep);
 
         /* Set the desired wakeup mode. */
         pm_set_sys_wakeup_mode(pm_sys_wakeup_mode_fast);
 
-        /* Start main task(s) here (text menu available via UART1 to control application) */
+        /* Start main task(s) here*/
         OS_TASK_CREATE( "I2C master",            /* The text name assigned to the task, for
                                                    debug only; not used by the kernel. */
                 i2c_master_task,                /* The function that implements the task. */
@@ -86,8 +86,7 @@ static void system_init( void *pvParameters )
                 i2c_slave_task,                /* The function that implements the task. */
                 NULL,                           /* The parameter passed to the task. */
                 256 * OS_STACK_WORD_SIZE,
-                /* The number of bytes to allocate to the
-                                                                   stack of the task. */
+                /* The number of bytes to allocate to the stack of the task. */
                 mainTEMPLATE_TASK_PRIORITY,     /* The priority assigned to the task. */
                 i2c_task_s );                       /* The task handle */
         OS_ASSERT(i2c_task_s);

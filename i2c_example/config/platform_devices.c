@@ -5,7 +5,7 @@
  *
  * @brief Configuration of devices connected to board data structures
  *
- * Copyright (C) 2017-2020 Dialog Semiconductor.
+ * Copyright (C) 2017-2022 Dialog Semiconductor.
  * This computer program includes Confidential, Proprietary Information
  * of Dialog Semiconductor. All Rights Reserved.
  *

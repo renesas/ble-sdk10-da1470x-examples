@@ -4,7 +4,7 @@
  *
  * @brief I2C master and slave tasks
  *
- * Copyright (C) 2020 Dialog Semiconductor.
+ * Copyright (C) 2022 Dialog Semiconductor.
  * This computer program includes Confidential, Proprietary Information
  * of Dialog Semiconductor. All Rights Reserved.
  *
@@ -25,8 +25,6 @@ extern OS_TASK i2c_task_s;
 extern OS_TASK i2c_task_m;
 
 /* Retained symbols */
-
-//__RETAINED static OS_EVENT signal_i2c_async_done;
 
 /*
  * Error code returned after an I2C operation. It can be used
@@ -137,7 +135,6 @@ i2c_dev_slave_event_callbacks_t slave_callbacks = {
 
 void i2c_master_task( void *pvParameters )
 {
-
         unsigned char resp[I2C_RESPONSE_SIZE];
         ad_i2c_handle_t _master_handle = ad_i2c_open(I2C_MASTER_DEVICE);
 
@@ -154,13 +151,13 @@ void i2c_master_task( void *pvParameters )
                 loop_counter++;
                 if (loop_counter % (1000 / OS_TICKS_2_MS(COUNTER_FREQUENCY_MS)) == 0) {
                         transaction_counter++;
-                        unsigned char * _req = (unsigned char *)"callbacks?";
-                        printf("Write I2C [%s] : \n", _req);
+                        unsigned char * req = (unsigned char *)"callbacks?";
+                        printf("Write I2C [%s] : \n", req);
 
 #if (I2C_ASYNC_EN)
                         uint32_t notif = 0;
                         I2C_error_code = ad_i2c_write_read_async(_master_handle,
-                                                 _req,
+                                                 req,
                                                  I2C_REQUEST_SIZE,
                                                  resp,
                                                  I2C_RESPONSE_SIZE,
@@ -181,7 +178,7 @@ void i2c_master_task( void *pvParameters )
 
 #else
                  I2C_error_code = ad_i2c_write_read_with_to(_master_handle,
-                                                   _req,
+                                                   req,
                                                    I2C_REQUEST_SIZE,//reduce this to simulate incomplete send
                                                    resp,
                                                    I2C_RESPONSE_SIZE,
