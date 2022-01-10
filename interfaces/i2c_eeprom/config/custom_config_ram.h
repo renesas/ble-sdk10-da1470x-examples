@@ -26,9 +26,6 @@
 
 #define dg_configFLASH_CONNECTED_TO             (FLASH_IS_NOT_CONNECTED)
 
-#define dg_configOQSPI_FLASH_HEADER_FILE        "oqspi_mx66um1g45g.h"
-#define dg_configOQSPI_FLASH_CONFIG             oqspi_mx66um1g45g_cfg
-
 #define dg_configUSE_SW_CURSOR                  (1)
 
 
@@ -47,6 +44,12 @@
 #define dg_configFLASH_ADAPTER                  (0)
 #define dg_configNVMS_ADAPTER                   (0)
 #define dg_configNVMS_VES                       (0)
+
+#define dg_configFLASH_AUTODETECT               (1)
+#define dg_configQSPIC2_DEV_AUTODETECT          (1)
+#define dg_configFLASH_POWER_DOWN               (1)
+
+#define dg_configOQSPI_FLASH_AUTODETECT         (1)
 
 #define dg_configUSE_HW_USB                     (0)
 
