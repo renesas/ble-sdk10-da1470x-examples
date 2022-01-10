@@ -206,7 +206,7 @@ static void gpio_task( void *pvParameters )
                  */
                 led_status ^= 1;
 
-                printf("you turn me %s baby\n", led_status?"ON":"OFF");
+                printf("you turn me %s baby\r\n", led_status?"ON":"OFF");
 
                 ad_io_configure(output_gpio_cfg, ARRAY_LENGTH(output_gpio_cfg), HW_GPIO_POWER_V33, led_status);
         }
