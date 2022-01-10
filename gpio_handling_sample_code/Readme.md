@@ -1,5 +1,7 @@
 # GPIO Pins Handling
 
+For the purpose of demonstrating the handling of GPIO in the SDK10, 
+in this example we are implementing a classic "blinky" application where a GPIO state is toggled every second.
 The GPIO peripheral block is powered by the MEM power domain (PD_MEM) and thus, it it is always enabled during M33 runtime.
 GPIO Pins must be set to latch disabled state before the ARM M33 enters sleep and activated at M33 wakeup. 
 Please note that the developer does not have to control the GPIO pins used by adapters (e.g. I2C pins). 
