@@ -1,9 +1,9 @@
 /**
  ****************************************************************************************
  *
- * @file custom_config_qspi.h
+ * @file custom_config_oqspi.h
  *
- * @brief Board Support Package. User Configuration file for cached QSPI mode.
+ * @brief Board Support Package. User Configuration file for cached O/QSPI mode.
  *
  * Copyright (C) 2015-2021 Dialog Semiconductor.
  * This computer program includes Confidential, Proprietary Information
@@ -12,8 +12,8 @@
  ****************************************************************************************
  */
 
-#ifndef CUSTOM_CONFIG_QSPI_H_
-#define CUSTOM_CONFIG_QSPI_H_
+#ifndef CUSTOM_CONFIG_OQSPI_H_
+#define CUSTOM_CONFIG_OQSPI_H_
 
 #include "bsp_definitions.h"
 
@@ -69,4 +69,4 @@
 /* Include middleware default values */
 #include "middleware_defaults.h"
 
-#endif /* CUSTOM_CONFIG_QSPI_H_ */
+#endif /* CUSTOM_CONFIG_OQSPI_H_ */
