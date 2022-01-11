@@ -48,6 +48,14 @@
 #define dg_configNVMS_ADAPTER                   (0)
 #define dg_configNVMS_VES                       (0)
 
+#define dg_configFLASH_AUTODETECT               (1)
+#define dg_configOQSPI_FLASH_AUTODETECT         (1)
+
+/*If daughterboard has Winbond W25Q64JWIM flash and segger_flash_loader will be used please uncomment the lines below */
+//#define dg_configUSE_SEGGER_FLASH_LOADER        (1)
+//#define dg_configOQSPI_FLASH_HEADER_FILE                 "oqspi_w25q64jwim.h"
+//#define dg_configOQSPI_FLASH_CONFIG                      oqspi_w25q64jwim_cfg
+
 #define dg_configUSE_SYS_TRNG                   (0)
 #define dg_configUSE_SYS_DRBG                   (0)
 
