@@ -28,11 +28,12 @@
 #include "hw_sys.h"
 #include "hw_wkup.h"
 
+#if dg_configUSE_WDOG
+#include "sys_watchdog.h"
+#endif
+
 /* Task priorities */
 #define mainTEMPLATE_TASK_PRIORITY              ( OS_TASK_PRIORITY_NORMAL )
-
-/* The rate at which data is template task counter is incremented. */
-#define mainCOUNTER_FREQUENCY_MS                OS_MS_2_TICKS(200)
 
 /******** Notification Bitmasks ********/
 #define WKUP_KEY_PRESS_EVENT_NOTIF              (1 << 2)
@@ -50,36 +51,40 @@
  *       (the pin is connected to a pull-down resistor)
  *
  **/
-#define WKUP_TRIGGER_STATE                      (0)     // State for KEY interrupt
+#define KEY_WKUP_TRIGGER_STATE                  (0)     // State for KEY interrupt
 
-#define GPIO_TRIGGER_STATE                      (0)     // State for GPIO interrupt
+#define GPIO_WKUP_TRIGGER_STATE                 (0)     // State for GPIO interrupt
 /*
  * Macro used for selecting if the wake-up trigger is edge or level sensitive
  *
  * 0 -> The trigger is level sensitive
  * 1 -> The trigger is edge sensitive
  */
-#define GPIO_TRIGGER_SENSITIVITY                (1)
+#define GPIO_WKUP_TRIGGER_SENSITIVITY           (1)
 
-#if (dg_configWKUP_KEY_BLOCK_ENABLE)
-#define WKUP_TRIGGER_ENABLED                    (1)
+#if (WKUP_KEY_BLOCK_ENABLE)
+#define KEY_WKUP_TRIGGER_ENABLED                (1)
 #else
-#define WKUP_TRIGGER_ENABLED                    (0)
+#define KEY_WKUP_TRIGGER_ENABLED                (0)
 #endif
 
-#if (dg_configWKUP_GPIO_P1_BLOCK_ENABLE)
-#define GPIO_TRIGGER_ENABLED                    (1)
+#if (WKUP_GPIO_P1_BLOCK_ENABLE)
+#define GPIO_WKUP_TRIGGER_ENABLED               (1)
 #else
-#define GPIO_TRIGGER_ENABLED                    (0)
+#define GPIO_WKUP_TRIGGER_ENABLED               (0)
+#endif
+
+#if dg_configUSE_WDOG
+__RETAINED_RW int8_t idle_task_wdog_id = -1;
 #endif
 
 /********************************* Custom wake up settings ************************************/
 wkup_config pin_wkup_conf = {
         .debounce = 10,
-        .pin_wkup_state[HW_GPIO_PORT_1] = ( WKUP_TRIGGER_ENABLED << KEY1_PIN ),
-        .pin_gpio_state[HW_GPIO_PORT_1] = ( (WKUP_TRIGGER_ENABLED | GPIO_TRIGGER_ENABLED) << KEY1_PIN) | (GPIO_TRIGGER_ENABLED << KEY2_PIN ),
-        .pin_trigger[HW_GPIO_PORT_1]    = ( WKUP_TRIGGER_STATE << KEY1_PIN) | (GPIO_TRIGGER_STATE << KEY2_PIN ),
-        .gpio_sense[HW_GPIO_PORT_1]     = ( GPIO_TRIGGER_SENSITIVITY << KEY1_PIN) | (GPIO_TRIGGER_SENSITIVITY << KEY2_PIN ),
+        .pin_wkup_state[HW_GPIO_PORT_1] = ( KEY_WKUP_TRIGGER_ENABLED << KEY1_PIN ),
+        .pin_gpio_state[HW_GPIO_PORT_1] = ( (KEY_WKUP_TRIGGER_ENABLED | GPIO_WKUP_TRIGGER_ENABLED) << KEY1_PIN) | (GPIO_WKUP_TRIGGER_ENABLED << KEY2_PIN ),
+        .pin_trigger[HW_GPIO_PORT_1]    = ( KEY_WKUP_TRIGGER_STATE << KEY1_PIN) | (GPIO_WKUP_TRIGGER_STATE << KEY2_PIN ),
+        .gpio_sense[HW_GPIO_PORT_1]     = ( GPIO_WKUP_TRIGGER_SENSITIVITY << KEY1_PIN) | (GPIO_WKUP_TRIGGER_SENSITIVITY << KEY2_PIN ),
 };
 /********************************************************************************************/
 
@@ -94,7 +99,7 @@ static OS_TASK xHandle;
 /* Task handle */
 __RETAINED static OS_TASK task_h;
 
-#if (dg_configWKUP_KEY_BLOCK_ENABLE)
+#if (WKUP_KEY_BLOCK_ENABLE)
 void wkup_deb_interrupt_cb(void)
 {
         uint32_t event = 0;
@@ -106,9 +111,9 @@ void wkup_deb_interrupt_cb(void)
         /* Mask the last bit from the enumeration, 0 stands for low 1 stands for high state */
         trigger = hw_wkup_get_trigger(KEY1_PORT, KEY1_PIN) & (1 << 0);
 
-        event = ((trigger == WKUP_TRIGGER_STATE) ? WKUP_KEY_PRESS_EVENT_NOTIF : WKUP_KEY_RELEASE_EVENT_NOTIF);
+        event = ((trigger == KEY_WKUP_TRIGGER_STATE) ? WKUP_KEY_PRESS_EVENT_NOTIF : WKUP_KEY_RELEASE_EVENT_NOTIF);
 
-        pin_wkup_conf.pin_trigger[KEY1_PORT] = (!trigger << KEY1_PIN) | (GPIO_TRIGGER_STATE << KEY2_PIN);
+        pin_wkup_conf.pin_trigger[KEY1_PORT] = (!trigger << KEY1_PIN) | (GPIO_WKUP_TRIGGER_STATE << KEY2_PIN);
 
         hw_wkup_configure(&pin_wkup_conf);
 
@@ -116,7 +121,7 @@ void wkup_deb_interrupt_cb(void)
 }
 #endif
 
-#if (dg_configWKUP_GPIO_P1_BLOCK_ENABLE)
+#if (WKUP_GPIO_P1_BLOCK_ENABLE)
 void wkup_gpio_interrupt_cb(void)
 {
         uint32_t status, event = 0;
@@ -149,7 +154,7 @@ static void wkup_init(void)
         /* Initialize the WKUP controller */
         hw_wkup_init(&pin_wkup_conf);
 
-#if (dg_configWKUP_KEY_BLOCK_ENABLE)
+#if (WKUP_KEY_BLOCK_ENABLE)
         /*
          * Enable interrupts produced by the KEY block of the wakeup controller (debounce
          * circuitry) and register a callback function to hit following a KEY event.
@@ -157,7 +162,7 @@ static void wkup_init(void)
         hw_wkup_register_key_interrupt(wkup_deb_interrupt_cb, 2);
 #endif
 
-#if (dg_configWKUP_GPIO_P1_BLOCK_ENABLE)
+#if (WKUP_GPIO_P1_BLOCK_ENABLE)
         /*
          * Enable interrupts produced by the GPIO block of the wakeup controller
          * and register a callback function to hit following a KEY event.
@@ -181,6 +186,16 @@ static OS_TASK_FUNCTION(system_init, pvParameters)
         cm_apb_set_clock_divider(apb_div1);
         cm_ahb_set_clock_divider(ahb_div1);
         cm_lp_clk_init();
+
+        /* Initialize platform watchdog */
+        sys_watchdog_init();
+
+#if dg_configUSE_WDOG
+        /* Register the Idle task first */
+        idle_task_wdog_id = sys_watchdog_register(false);
+        ASSERT_WARNING(idle_task_wdog_id != -1);
+        sys_watchdog_configure_idle_id(idle_task_wdog_id);
+#endif
 
         /* Prepare the hardware to run this demo. */
         prvSetupHardware();
@@ -242,7 +257,8 @@ int main( void )
 }
 
 /**
- * @brief Template task increases a counter every mainCOUNTER_FREQUENCY_MS ms
+ * @brief Application task, handles the notifications from the triggered ISRs
+ * and prints the corresponding message
  */
 static OS_TASK_FUNCTION(extWakeUpTriggerTask, pvParameters)
 {
@@ -250,11 +266,29 @@ static OS_TASK_FUNCTION(extWakeUpTriggerTask, pvParameters)
 
         printf("Wake-up Controller Demonstration Sample Code.\n\r");
 
+#if dg_configUSE_WDOG
+        int8_t wakeup_task_wdog_id = -1;
+        /* Register the Idle task first */
+        wakeup_task_wdog_id = sys_watchdog_register(false);
+        ASSERT_WARNING(wakeup_task_wdog_id != -1);
+#endif
+
         wkup_init();
 
         for ( ;; ) {
+
+                /* Notify watchdog on each loop */
+                sys_watchdog_notify(wakeup_task_wdog_id);
+
+                /* Suspend watchdog while blocking on ble_get_event() */
+                sys_watchdog_suspend(wakeup_task_wdog_id);
+
                 /* Wait for the external interruption notification */
                 OS_TASK_NOTIFY_WAIT(0x0, OS_TASK_NOTIFY_ALL_BITS, &ulNotifiedValue, OS_TASK_NOTIFY_FOREVER);
+
+                /* Trigger the watchdog notification */
+                sys_watchdog_notify_and_resume(wakeup_task_wdog_id);
+
                 /* Check the notification is the expected value */
 
                 if(ulNotifiedValue & WKUP_KEY_PRESS_EVENT_NOTIF) {
@@ -291,18 +325,18 @@ static void periph_init(void)
  */
 static void prvSetupHardware( void )
 {
-#if (dg_configWKUP_GPIO_P1_BLOCK_ENABLE) || \
-    ( (dg_configWKUP_KEY_BLOCK_ENABLE) && (!dg_configUSE_SYS_USB) && (!dg_configENABLE_DEBUGGER) )
+#if (WKUP_GPIO_P1_BLOCK_ENABLE) || \
+    ( (WKUP_KEY_BLOCK_ENABLE) && (!dg_configUSE_SYS_USB) && (!dg_configENABLE_DEBUGGER) )
         uint32_t pdc_wkup_combo_id;
 #endif
 
         /*
          * The IRQ produced by the KEY sub block of the wakeup controller (debounced IO
-         * IRQ) is multiplexed with other trigger sources (VBUS IRQ, SYS2CMAC IRQ, JTAG
-         * present) in a single PDC peripheral trigger ID (HW_PDC_PERIPH_TRIG_ID_COMBO).
+         * IRQ) is multiplexed with other trigger sources (VBUS IRQ,  JTAG IRQ present)
+         * in a single PDC peripheral trigger ID (HW_PDC_PERIPH_TRIG_ID_COMBO).
          */
-#if (dg_configWKUP_KEY_BLOCK_ENABLE)
-#if (!dg_configENABLE_DEBUGGER) && (!dg_configUSE_SYS_USB)
+#if (WKUP_KEY_BLOCK_ENABLE)
+#if (!dg_configENABLE_DEBUGGER) && (!dg_configUSE_SYS_CHARGER)
 
         pdc_wkup_combo_id = hw_pdc_add_entry(HW_PDC_LUT_ENTRY_VAL(
                                                 HW_PDC_TRIG_SELECT_PERIPHERAL,
@@ -316,19 +350,10 @@ static void prvSetupHardware( void )
 #endif
 #endif
 
-#if (dg_configWKUP_GPIO_P1_BLOCK_ENABLE)
+#if (WKUP_GPIO_P1_BLOCK_ENABLE)
         pdc_wkup_combo_id = hw_pdc_add_entry(HW_PDC_LUT_ENTRY_VAL(
-                                                KEY2_PORT,
-                                                KEY2_PIN,
-                                                HW_PDC_MASTER_CM33, 0));
-        OS_ASSERT(pdc_wkup_combo_id != HW_PDC_INVALID_LUT_INDEX);
-
-        hw_pdc_set_pending(pdc_wkup_combo_id);
-        hw_pdc_acknowledge(pdc_wkup_combo_id);
-
-        pdc_wkup_combo_id = hw_pdc_add_entry(HW_PDC_LUT_ENTRY_VAL(
-                                                KEY1_PORT,
-                                                KEY1_PIN,
+                                                HW_PDC_TRIG_SELECT_PERIPHERAL,
+                                                HW_PDC_PERIPH_TRIG_ID_GPIO_P1,
                                                 HW_PDC_MASTER_CM33, 0));
         OS_ASSERT(pdc_wkup_combo_id != HW_PDC_INVALID_LUT_INDEX);
 
@@ -339,9 +364,6 @@ static void prvSetupHardware( void )
         /* Init hardware */
         pm_system_init(periph_init);
 
-        /* Enable the COM power domain before handling any GPIO pin */
-        hw_sys_pd_com_enable();
-
         /* Configure the KEY1 push button on Pro DevKit */
         HW_GPIO_SET_PIN_FUNCTION(KEY1);
         HW_GPIO_PAD_LATCH_ENABLE(KEY1);
@@ -350,16 +372,13 @@ static void prvSetupHardware( void )
 /*
  * Wouldn't be valid to activate both key PDC entry and GPIO on another pin ?
  */
-#if (dg_configWKUP_GPIO_P1_BLOCK_ENABLE)
+#if (WKUP_GPIO_P1_BLOCK_ENABLE)
         /* Configure the KEY2 push button on Pro DevKit */
         HW_GPIO_SET_PIN_FUNCTION(KEY2);
         HW_GPIO_PAD_LATCH_ENABLE(KEY2);
         /* Lock the mode of the target GPIO pin */
         HW_GPIO_PAD_LATCH_DISABLE(KEY2);
 #endif
-
-        /* Disable the COM power domain after handling the GPIO pins */
-        hw_sys_pd_com_disable();
 }
 
 /**
@@ -395,6 +414,9 @@ OS_APP_MALLOC_FAILED( void )
  */
 OS_APP_IDLE( void )
 {
+#if dg_configUSE_WDOG
+        sys_watchdog_notify(idle_task_wdog_id);
+#endif
 }
 
 /**
