@@ -3,9 +3,9 @@
  *
  * @file custom_config_oqspi.h
  *
- * @brief Custom configuration file for non-FreeRTOS applications executing from OQSPI.
+ * @brief Custom configuration file for FreeRTOS applications executing from OQSPI.
  *
- * Copyright (C) 2020-2021 Dialog Semiconductor.
+ * Copyright (C) 2020-2022 Dialog Semiconductor.
  * This computer program includes Confidential, Proprietary Information
  * of Dialog Semiconductor. All Rights Reserved.
  *

@@ -45,12 +45,12 @@ The following file structure will be created:
 
 ## Existing build configurations
 
-The template contains build configurations for executing it from RAM or QSPI. 
+The template contains build configurations for executing it from RAM or (O)QSPI. 
 
-- `DA1469X-00-Debug_RAM`. The project is built to be run from RAM. The executable is built with debug (-Og) information.
-- `DA1469X-00-Debug_OQSPI`. The project is built to be run from (O)QSPI. The executable is built with debug (-Og) information.
-- `DA1469X-00-Release_RAM`. The project is built to be run from RAM. The executable is built with no debug information and size optimization (-Os).
-- `DA1469X-00-Release_OQSPI`. The project is built to be run from (O)QSPI. The executable is built with no debug information and size optimization (-Os).
+- `DA1470X-00-Debug_RAM`. The project is built to be run from RAM. The executable is built with debug (-Og) information.
+- `DA1470X-00-Debug_OQSPI`. The project is built to be run from (O)QSPI. The executable is built with debug (-Og) information.
+- `DA1470X-00-Release_RAM`. The project is built to be run from RAM. The executable is built with no debug information and size optimization (-Os).
+- `DA1470X-00-Release_OQSPI`. The project is built to be run from (O)QSPI. The executable is built with no debug information and size optimization (-Os).
 
 ## RTT ENABLE
 
