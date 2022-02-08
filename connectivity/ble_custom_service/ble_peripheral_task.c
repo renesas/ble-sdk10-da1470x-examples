@@ -5,7 +5,7 @@
  *
  * @brief BLE peripheral task
  *
- * Copyright (C) 2015-2021 Dialog Semiconductor.
+ * Copyright (C) 2015-2022 Dialog Semiconductor.
  * This computer program includes Confidential, Proprietary Information
  * of Dialog Semiconductor. All Rights Reserved.
  *
@@ -42,11 +42,11 @@
 #define BCS_TIMER_NOTIF (1 << 3)
 
 /*
- * BLE peripheral advertising data
+ * Bluetooth LE peripheral advertising data
  */
 static const uint8_t adv_data[] = {
         0x12, GAP_DATA_TYPE_LOCAL_NAME,
-        'D', 'i', 'a', 'l', 'o', 'g', ' ', 'P', 'e', 'r', 'i', 'p', 'h', 'e', 'r', 'a', 'l'
+        'M', 'y', ' ', 'C', 'u', 's', 't', 'o', 'm', ' ', 'S', 'e', 'r', 'v', 'i', 'c', 'e'
 };
 
 static OS_TASK ble_peripheral_task_handle;
@@ -253,6 +253,69 @@ static const scps_callbacks_t scps_callbacks = {
 };
 #endif // CFG_SCPS
 
+
+#if CFG_MY_CUSTOM_SERVICE
+#include "my_custom_service.h"
+#include "hw_led.h"
+#include "hw_sys.h"
+
+/* Characteristic value */
+__RETAINED_RW uint8_t mcs_char_val = 0;
+
+/* Handle of custom Bluetooth LE service */
+__RETAINED_RW ble_service_t *mcs = NULL;
+
+/* LED state */
+__RETAINED bool led_active;
+
+/* Handler for read requests */
+static void mcs_get_char_val_cb(ble_service_t *svc, uint16_t conn_idx)
+{
+        uint8_t var_value = mcs_char_val;
+
+        /* Send the requested data to the peer device.  */
+        mcs_get_char_value_cfm(svc, conn_idx, ATT_ERROR_OK, &var_value);
+}
+
+
+/* Handler for write requests */
+static void mcs_set_char_val_cb(ble_service_t *svc, uint16_t conn_idx,
+                                                            const uint8_t *value)
+{
+        mcs_char_val = *value;
+
+        /*
+         * Check the written value and if it is equal to 0x01
+         * then turn on LED D1 on DevKit.
+         */
+        if (mcs_char_val == 0x01) {
+                /* Enable LED1 */
+                hw_led_on(HW_LED_MSK_LED_1);
+                led_active = true;
+        } else {
+                /* Disable LED1 */
+                hw_led_off(HW_LED_MSK_LED_1);
+                led_active = false;
+        }
+
+        /* Send an ACK to the peer device as a response to the write request */
+        mcs_set_char_value_cfm(svc, conn_idx, ATT_ERROR_OK);
+
+        /*
+         * Notify all the connected peer devices that characteristic value
+         * has been changed.
+         */
+        mcs_notify_char_value_all(mcs, &mcs_char_val);
+}
+
+/* Declare callback functions for specific Bluetooth LE events */
+static const my_custom_service_cb_t mcs_callbacks = {
+        .get_characteristic_value = mcs_get_char_val_cb,
+        .set_characteristic_value = mcs_set_char_val_cb,
+};
+#endif
+
+
 /*
  * Debug handlers
  */
@@ -442,6 +505,17 @@ OS_TASK_FUNCTION(ble_peripheral_task, params)
 #if CFG_SCPS
         /* register ScPS */
         scps_init(&scps_callbacks);
+#endif
+
+#if CFG_MY_CUSTOM_SERVICE
+        /* Initialize LED D1 */
+        hw_led_pwm_set_duty_cycle_pct_off(HW_LED_ID_LED_1, 10000, 0); // Duty cycle = 100%
+        hw_led_pwm_set_frequency_hz(1000); // Frequency = 1 kHz
+        hw_led_pwm_on(HW_LED_MSK_LED_1);
+        hw_led_off(HW_LED_MSK_LED_1);
+
+        /* Initialize the custom Bluetooth LE service */
+        mcs = mcs_init(&mcs_char_val, &mcs_callbacks);
 #endif
 
 #if CFG_CTS
