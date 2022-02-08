@@ -152,7 +152,7 @@ void i2c_master_task( void *pvParameters )
                 if (loop_counter % (1000 / OS_TICKS_2_MS(COUNTER_FREQUENCY_MS)) == 0) {
                         transaction_counter++;
                         unsigned char * req = (unsigned char *)"callbacks?";
-                        printf("Write I2C [%s] : \n", req);
+                        printf("Write I2C [%s] : \n\r", req);
 
 #if (I2C_ASYNC_EN)
                         uint32_t notif = 0;
