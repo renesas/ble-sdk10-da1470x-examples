@@ -41,7 +41,7 @@ before starting the app. The pins settings are localized in `peripheral_setup.h`
 |:-----------:|:-----------:|
 | Master      | Slave       |
 | P0_22 (SDA) | P0_24  (SDA)|
-| P0_12 (SCL) | P0_22  (SCL) |
+| P0_21 (SCL) | P0_23 (SCL)|
 
                                     MASTER          SLAVE (loopback) 
                                      |  |           |  |             
