@@ -189,7 +189,7 @@ void i2c_master_task( void *pvParameters )
                                 printf("Successfully read I2C:  [%s] \n", resp);
 
                         } else {
-                                printf("i2c read error(%d)\n", I2C_error_code);
+                                printf("i2c read error(%d)\n\r", I2C_error_code);
                         }
                         fflush(stdout);
                 }
