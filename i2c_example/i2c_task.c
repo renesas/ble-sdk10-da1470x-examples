@@ -186,7 +186,7 @@ void i2c_master_task( void *pvParameters )
                                                    OS_TIME_TO_TICKS(1000));
 #endif
                         if(0 == I2C_error_code){
-                                printf("Successfully read I2C:  [%s] \n", resp);
+                                printf("Successfully read I2C:  [%s] \n\r", resp);
 
                         } else {
                                 printf("i2c read error(%d)\n\r", I2C_error_code);
