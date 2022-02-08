@@ -40,7 +40,7 @@ before starting the app. The pins settings are localized in `peripheral_setup.h`
 | DA1470x     |             |
 |:-----------:|:-----------:|
 | Master      | Slave       |
-| P0_11 (SDA) | P0_21  (SDA) |
+| P0_22 (SDA) | P0_24  (SDA)|
 | P0_12 (SCL) | P0_22  (SCL) |
 
                                     MASTER          SLAVE (loopback) 
