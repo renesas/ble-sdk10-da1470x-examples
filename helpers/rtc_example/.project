@@ -80,11 +80,6 @@
 			<locationURI>SDKROOT/sdk/bsp/peripherals</locationURI>
 		</link>
 		<link>
-			<name>sdk/snc</name>
-			<type>2</type>
-			<locationURI>SDKROOT/sdk/bsp/snc</locationURI>
-		</link>
-		<link>
 			<name>sdk/sys_man</name>
 			<type>2</type>
 			<locationURI>SDKROOT/sdk/bsp/system/sys_man</locationURI>
@@ -98,7 +93,7 @@
 	<variableList>
 		<variable>
 			<name>SDKROOT</name>
-			<value>$%7BPARENT-4-PROJECT_LOC%7D</value>
+			<value>$%7BWORKSPACE_LOC%7D</value>
 		</variable>
 	</variableList>
 </projectDescription>

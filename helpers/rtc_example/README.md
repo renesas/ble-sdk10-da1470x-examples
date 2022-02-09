@@ -62,7 +62,7 @@ User will have to press reset button of the DUT and observe the RTC clock and ca
 
 ## Installation procedure
 
-The project is located in the `projects/dk_apps/demos/rtc_example` folder.
+The project is located in the `helpers/rtc_example` folder.
 
 To install the project follow the [General Installation and Debugging Procedure](@ref install_and_debug_procedure).
 
@@ -72,15 +72,14 @@ The following file structure will be created:
 
 * projects/dk_apps/demos/rtc_example
         * config
-                * custom_config_qspi.h
+                * custom_config_oqspi.h
                 * custom_config_ram.h
-        * sdk
-        * startup
         * main.c
+        * README.md
 
 ## Existing build configurations
 
-The project contains build configurations for executing it from RAM or QSPI. 
+The project contains build configurations for executing it from RAM or (O)QSPI. 
 
 ## RTT ENABLE
 
