@@ -52,13 +52,11 @@ before starting the app. The pins settings are localized in `peripheral_setup.h`
 
 * **Software configuration**
   - This example requires:
-  - Smartsnippets Studio V2.0.16 or greater.
-  - SDK 10.0.10.x
+  - Smartsnippets Studio V2.0.18 or greater.
+  - SDK 10.3.1.x
   - **SEGGER J-Link** tools should be downloaded and installed.
 
 ## Installation procedure
-
-The project is located in the \b `projects/dk_apps/examples/i2c_example` folder.
 
 To install the project follow the [General Installation and Debugging Procedure](@ref install_and_debug_procedure).
 
@@ -82,9 +80,9 @@ The following file structure will be created:
 The template contains build configurations for executing it from RAM or QSPI. 
 
 - `DA1470X-00-Debug_RAM`. The project is built to be run from RAM. The executable is built with debug (-Og) information.
-- `DA1470X-00-Debug_QSPI`. The project is built to be run from QSP. The executable is built with debug (-Og) information.
+- `DA1470X-00-Debug_OQSPI`. The project is built to be run from QSP. The executable is built with debug (-Og) information.
 - `DA1470X-00-Release_RAM`. The project is built to be run from RAM. The executable is built with no debug information and size optimization (-Os).
-- `DA1470X-00-Release_QSPI`. The project is built to be run from QSPI. The executable is built with no debug information and size optimization (-Os).
+- `DA1470X-00-Release_OQSPI`. The project is built to be run from QSPI. The executable is built with no debug information and size optimization (-Os).
 
 ## Dependencies / Considerations
 - This project can not be shared outside Dialog before checking if the customer has signed the SLA. 

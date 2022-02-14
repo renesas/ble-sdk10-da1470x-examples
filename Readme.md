@@ -8,7 +8,7 @@ The available devices in the DA1470x family are:
 - [DA14705](https://www.dialog-semiconductor.com/products/bluetooth-low-energy/da1470x)
 - [DA14706](https://www.dialog-semiconductor.com/products/bluetooth-low-energy/da1470x)
 
-For information about the DA1469x platform and how to bring up your development kit, please refer to the [Getting started User Manual](http://lpccs-docs.dialog-semiconductor.com/um-b-090-da1469x_getting_started/index.html)
+For information about the DA1470x platform and how to bring up your development kit, please refer to the [Getting started User Manual](http://lpccs-docs.dialog-semiconductor.com/um-b-090-da1469x_getting_started/index.html)
 
 ## Example usage
 
