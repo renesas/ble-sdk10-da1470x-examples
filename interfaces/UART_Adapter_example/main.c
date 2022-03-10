@@ -33,7 +33,6 @@
 #define UART2_NOTIF_BYTE_NOT_RECEIVED       ( 1 << 3 )
 
 __RETAINED OS_QUEUE uart2_Q;    /* Q used to pass the data between the two UART2 tasks */
-__RETAINED OS_MUTEX uart2_Mtx;  /* Mutex used to protect the open of the UART from more than one tasks */
 
 __RETAINED ad_uart_handle_t uart2_h; /* The Uart2 Handler is global because it is used by more than one tasks */
 
@@ -65,7 +64,6 @@ static void prvSetupHardware( void );
 static void system_init( void *pvParameters )
 {
         OS_TASK uart_test_task_h = NULL;
-        OS_BASE_TYPE ret;
 
 #if defined CONFIG_RETARGET
         extern void retarget_init(void);
@@ -114,10 +112,6 @@ static void system_init( void *pvParameters )
                         uart_test_task_h );                             /* The task handle */
         OS_ASSERT(uart_test_task_h);                                    /* Check that the task created OK */
 
-        ret = OS_MUTEX_CREATE(uart2_Mtx);                               /* Create the MUTEX to be used for
-                                                                         * protected opening of UART2 */
-        OS_ASSERT(ret == OS_MUTEX_CREATE_SUCCESS);                      /* Check that mutex created OK */
-
         OS_QUEUE_CREATE(uart2_Q, sizeof(char), 100);                    /* Create the uart2_Q */
         OS_ASSERT(uart2_Q);                                             /* Check that Q created OK */
 
@@ -140,7 +134,7 @@ static void system_init( void *pvParameters )
                         NULL,                                           /* The parameter passed to the task. */
                         configMINIMAL_STACK_SIZE * OS_STACK_WORD_SIZE,  /* The number of bytes to allocate to the
                                                                            stack of the task. */
-                        OS_TASK_PRIORITY_NORMAL,                        /* The priority assigned to the task. */
+                        OS_TASK_PRIORITY_LOWEST,                        /* The priority assigned to the task. */
                         uart_test_task_h );                             /* The task handle */
         OS_ASSERT(uart_test_task_h);                                    /* Check that the task created OK */
 
@@ -250,15 +244,9 @@ static void prv_Uart2_async_TX_Task( void *pvParameters )
         OS_BASE_TYPE ret __UNUSED;
         uint32_t notif;
 
-        OS_MUTEX_GET(uart2_Mtx, OS_MUTEX_FOREVER);                      /* Make sure there will be protected the opening
-                                                                         * of the UART2 because there are two tasks that will try to open it. */
-                                                                        /* The protection can be achieved also by calling the
-                                                                         * OS_ENTER_CRITICAL_SECTION();/OS_LEAVE_CRITICAL_SECTION(); */
-
         if (uart2_h == NULL) {
                 uart2_h = ad_uart_open(&uart2_uart_conf);               /* Open the UART2 only if is not opened by the other task. */
         }
-        OS_MUTEX_PUT(uart2_Mtx);                                        /* Release protection for the opening of UART2 */
 
         ASSERT_ERROR(uart2_h != NULL);                                  /* Check if the UART2 opened with success */
 
@@ -314,15 +302,9 @@ static void prv_Uart2_async_RX_Task( void *pvParameters )
         OS_BASE_TYPE ret __UNUSED;
         uint32_t notif;
 
-        OS_MUTEX_GET(uart2_Mtx, OS_MUTEX_FOREVER);                      /* Make sure there will be protected the opening
-                                                                         * of the UART2 because there are two tasks that will try to open it. */
-                                                                        /* The protection can be achieved also by calling the
-                                                                         * OS_ENTER_CRITICAL_SECTION();/OS_LEAVE_CRITICAL_SECTION(); */
-
         if (uart2_h == NULL) {
                 uart2_h = ad_uart_open(&uart2_uart_conf);               /* Open the UART2 only if is not opened by the other task. */
         }
-        OS_MUTEX_PUT(uart2_Mtx);                                        /* Release protection for the opening of UART2 */
 
         ASSERT_ERROR(uart2_h != NULL);                                  /* Check if the UART2 opened with success */
 
