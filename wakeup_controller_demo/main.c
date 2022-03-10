@@ -3,9 +3,9 @@
  *
  * @file main.c
  *
- * @brief FreeRTOS template application with retarget
+ * @brief External Interrupt Example
  *
- * Copyright (C) 2015-2021 Dialog Semiconductor.
+ * Copyright (C) 2015-2022 Dialog Semiconductor.
  * This computer program includes Confidential, Proprietary Information
  * of Dialog Semiconductor. All Rights Reserved.
  *

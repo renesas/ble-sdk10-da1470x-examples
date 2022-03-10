@@ -54,13 +54,6 @@
 #define dg_configUSE_SYS_DRBG                   (0)
 
 /*
- * Choose the appropriate flash mounted on the daughter board.
- * The default flash in bsp_defaults is the w25q64
- */
-//#define dg_configOQSPI_FLASH_HEADER_FILE        "oqspi_mx66um1g45g.h"
-//#define dg_configOQSPI_FLASH_CONFIG             oqspi_mx66um1g45g_cfg
-
-/*
  * Enable/disable the GPIO sub block of the WKUP controller. Valid values are:
  *
  * 1 --> Enable the GPIO block as well as non-debounced IO IRQs

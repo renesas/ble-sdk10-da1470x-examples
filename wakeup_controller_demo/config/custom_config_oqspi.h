@@ -27,7 +27,7 @@
 
 #define dg_configFLASH_CONNECTED_TO             (FLASH_CONNECTED_TO_1V8F)
 #define dg_configOQSPI_FLASH_POWER_DOWN         (1)
-
+#define dg_configOQSPI_FLASH_AUTODETECT         (1)
 
 #define dg_configUSE_SW_CURSOR                  (1)
 
@@ -66,13 +66,6 @@
  * 0 --> Disable the KEY block.
  */
 #define WKUP_KEY_BLOCK_ENABLE                   (1)
-
-/*
- * Choose the appropriate flash mounted on the daughter board.
- * The default flash in bsp_defaults is the w25q64
- */
-//#define dg_configOQSPI_FLASH_HEADER_FILE        "oqspi_mx66um1g45g.h"
-//#define dg_configOQSPI_FLASH_CONFIG             oqspi_mx66um1g45g_cfg
 
 /* Include bsp default values */
 #include "bsp_defaults.h"
