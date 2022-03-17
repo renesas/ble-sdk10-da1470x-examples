@@ -95,6 +95,11 @@
 			<locationURI>SDKROOT/sdk/bsp/system/sys_man</locationURI>
 		</link>
 		<link>
+			<name>sdk/usb</name>
+			<type>2</type>
+			<locationURI>SDKROOT/sdk/interfaces/usb</locationURI>
+		</link>
+		<link>
 			<name>sdk/util</name>
 			<type>2</type>
 			<locationURI>SDKROOT/sdk/bsp/util</locationURI>

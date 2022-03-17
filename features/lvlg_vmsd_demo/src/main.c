@@ -29,6 +29,9 @@
 #include "hw_pdc.h"
 #include "ad_pmu.h"
 #include "gdi.h"
+
+#include "sys_usb.h"
+
 #ifdef CONFIG_RTT
 #include "SEGGER_RTT.h"
 #endif
@@ -57,6 +60,8 @@ const unsigned char ucExpectedInterruptStackValues[] = { 0xCC, 0xCC, 0xCC, 0xCC,
 #if dg_configUSE_WDOG
 INITIALISED_PRIVILEGED_DATA int8_t idle_task_wdog_id = -1;
 #endif
+
+void MainTask(void);
 
 /*
  * Perform any application specific hardware configuration.  The clocks,
@@ -113,6 +118,7 @@ static void system_init(void *pvParameters)
         /* Set the desired sleep mode */
         pm_set_wakeup_mode(true);
         pm_sleep_mode_set(pm_mode_extended_sleep);
+        sys_usb_init();
 
 #if defined CONFIG_RETARGET
         retarget_init();
@@ -269,6 +275,30 @@ static void _wkup_init(void)
  */
 static void periph_init(void)
 {
+#if (DEVICE_FAMILY == DA1468X)
+#if defined CONFIG_RETARGET
+#if DEVICE_FPGA
+
+        set_FPGA_SW3_21(false, false);
+#endif
+        HW_GPIO_SET_PIN_FUNCTION(SER1_TX);
+        HW_GPIO_SET_PIN_FUNCTION(SER1_RX);
+#endif
+#endif /* DEVICE_FAMILY */
+
+#if (DEVICE_FAMILY == DA1469X)
+        /* USB data pin configuration */
+        hw_gpio_set_pin_function(HW_GPIO_PORT_0, HW_GPIO_PIN_14, HW_GPIO_MODE_INPUT,
+                                 HW_GPIO_FUNC_USB);
+        hw_gpio_set_pin_function(HW_GPIO_PORT_0, HW_GPIO_PIN_15, HW_GPIO_MODE_INPUT,
+                                 HW_GPIO_FUNC_USB);
+#elif (DEVICE_FAMILY == DA1470X)
+        /* USB data pin configuration */
+        hw_gpio_set_pin_function(HW_GPIO_PORT_2, HW_GPIO_PIN_10, HW_GPIO_MODE_INPUT,
+                                 HW_GPIO_FUNC_USB);
+        hw_gpio_set_pin_function(HW_GPIO_PORT_2, HW_GPIO_PIN_11, HW_GPIO_MODE_INPUT,
+                                 HW_GPIO_FUNC_USB);
+#endif /* DEVICE_FAMILY */
 #if dg_configUSE_HW_QSPI2
         /*
          * Disable the tCEM operation of QSPIC2 (no issues with the default PSRAM memory). Otherwise,
