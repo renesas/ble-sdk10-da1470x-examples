@@ -113,6 +113,19 @@ static int usb_read_from_nvms(nvms_partition_id_t nv_id, uint8* pData, uint32 Of
         }
         return -1;
 }
+
+static int usb_write_to_nvms(nvms_partition_id_t nv_id, uint8* pData, uint32 Off, uint32 Numbytes)
+{
+        nvms_t nvms;
+
+        nvms = ad_nvms_open(nv_id);
+        if (nvms) {
+                ad_nvms_write(nvms, Off, pData, Numbytes);
+                ad_nvms_flush(nvms, true);
+                return 0;
+        }
+        return -1;
+}
 #endif
 /*********************************************************************
  *
@@ -128,6 +141,46 @@ static int usb_read_from_nvms(nvms_partition_id_t nv_id, uint8* pData, uint32 Of
 static int _cbOnWrite(unsigned Lun, const U8* pData, U32 Off, U32 NumBytes,
         const USB_VMSD_FILE_INFO* pFile)
 {
+        int write_bytes;
+
+        if (NumBytes == 0) {
+                return 0;
+        }
+
+        if ((Off == 0 && memcmp(APP_FILE_HEADER, (const void *)pData, sizeof(APP_FILE_HEADER) - 1) != 0) ||
+                (Off > 0 && !isFwFile)) {
+                isFwFile = false;
+                _ReattchRequest = 1;
+
+                //Make the device read-only
+                USBD_MSD_UpdateWriteProtect(0,1);
+
+                USBD_MSD_RequestRefresh(0, USB_MSD_RE_ATTACH | USB_MSD_TRY_DISCONNECT);
+                return -1;
+        }
+
+        if (Off == 0) {
+                isFwFile = true;
+        }
+
+        if ((Off + NumBytes) > VMSD_DATA_SIZE) {
+                write_bytes = VMSD_DATA_SIZE - Off;
+        } else {
+                write_bytes = NumBytes;
+        }
+
+        if ((Off + write_bytes) <= VMSD_DATA_SIZE) {
+#ifdef VMSD_USE_NVMS
+                usb_write_to_nvms(NVMS_GENERIC_PART, (uint8 *)pData, Off, write_bytes);
+#else
+                memcpy(vmsd_app_dat + Off, pData, write_bytes);
+#endif
+        }
+        else {
+                _ReattchRequest = 1;
+                USBD_MSD_RequestRefresh(0, USB_MSD_RE_ATTACH | USB_MSD_TRY_DISCONNECT);
+                return -1;
+        }
 
         return 0;
 }
@@ -244,6 +297,18 @@ uint32_t USB_VMSD_FS_BootSector_VolID_Config(void)
 
         return 0;
 }
+/*********************************************************************
+ *
+ *       _AddCDC
+ *
+ *  Function description
+ *    Add communication device class to USB stack
+ */
+static USB_CDC_HANDLE _AddCDC(void)
+{
+
+        return NULL;
+}
 
 void usb_cdc_vmsd_state_cb(void * pContext, U8 NewState)
 {
@@ -314,7 +379,7 @@ OS_TASK_FUNCTION(usb_cdc_eco_task, params)
 #endif
 
                 if (NumBytesReceived > 0) {
-                        //USBD_CDC_Write(hInst, usb_cdc_buf, NumBytesReceived, 0);
+                        USBD_CDC_Write(hInst, usb_cdc_buf, NumBytesReceived, 0);
                 }
         }
 }
@@ -329,7 +394,7 @@ OS_TASK_FUNCTION(usb_vmsd_task, params)
         USBD_CDC_Init();
         USBD_VMSD_Init();
         USBD_RegisterSCHook(&UsbpHook, usb_cdc_vmsd_state_cb, NULL);
-        //hInst = _AddCDC();
+        hInst = _AddCDC();
         USBD_VMSD_Add();
         USBD_SetDeviceInfo(&_DeviceInfo);
 #if ( dg_configUSE_SYS_CHARGER == 1 )
@@ -340,6 +405,17 @@ OS_TASK_FUNCTION(usb_vmsd_task, params)
 #endif
         USBD_Start();
 
+        /* Start the USB CDC application task. */
+        status = OS_TASK_CREATE("UsbCdcTask",   /* The text name assigned to the task, for
+                                                   debug only; not used by the kernel. */
+                        usb_cdc_eco_task,       /* The function that implements the task. */
+                        (void *)&hInst,         /* The parameter passed to the task. */
+                        512,                    /* The number of bytes to allocate to the
+                                                                   stack of the task. */
+                        usb_main_TASK_PRIORITY, /* The priority assigned to the task. */
+                        usb_cdc_task_handle);   /* The task handle. */
+
+        OS_ASSERT(status == OS_TASK_CREATE_SUCCESS);
 
         while (1) {
                 //
@@ -356,6 +432,7 @@ OS_TASK_FUNCTION(usb_vmsd_task, params)
                         _ReattchRequest = 0;
                 }
         }
+        OS_TASK_DELETE(OS_GET_CURRENT_TASK());
 }
 
 void usb_cdc_vmsd_start()
