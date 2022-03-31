@@ -22,13 +22,14 @@
 #define dg_configUSE_LP_CLK                     ( LP_CLK_32768 )
 #define dg_configCODE_LOCATION                  NON_VOLATILE_IS_NONE
 
-#define dg_configUSE_WDOG                       (1)
+#define dg_configUSE_WDOG                       (0)
 
 
 #define dg_configFLASH_CONNECTED_TO             (FLASH_IS_NOT_CONNECTED)
 
 
 #define dg_configUSE_SW_CURSOR                  (1)
+#define dg_configSYSTEMVIEW                     (0)
 
 /*************************************************************************************************\
  * FreeRTOS specific config
@@ -53,11 +54,6 @@
 
 #define dg_configFLASH_AUTODETECT               (1)
 #define dg_configOQSPI_FLASH_AUTODETECT         (1)
-
-/*If daughterboard has Winbond W25Q64JWIM flash and segger_flash_loader will be used please uncomment the lines below */
-//#define dg_configUSE_SEGGER_FLASH_LOADER        (1)
-//#define dg_configOQSPI_FLASH_HEADER_FILE                 "oqspi_w25q64jwim.h"
-//#define dg_configOQSPI_FLASH_CONFIG                      oqspi_w25q64jwim_cfg
 
 #define dg_configUSE_SYS_TRNG                   (0)
 #define dg_configUSE_SYS_DRBG                   (0)

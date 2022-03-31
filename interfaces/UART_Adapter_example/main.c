@@ -27,6 +27,16 @@
 #include "platform_devices.h"
 #include "ad_uart.h"
 
+#include "hw_gpio.h"
+
+#define CURSOR_PORT                             HW_GPIO_PORT_1
+#define CURSOR_RX                               HW_GPIO_PIN_10
+#define CURSOR_TX                               HW_GPIO_PIN_11
+#define CURSOR_RX_INT                           HW_GPIO_PIN_12
+#define CURSOR_TX_INT                           HW_GPIO_PIN_7
+#define CURSOR_ISSUE                            HW_GPIO_PIN_6
+
+
 #define UART2_NOTIF_BYTE_SENT               ( 1 << 0 )
 #define UART2_NOTIF_BYTE_NOT_SENT           ( 1 << 1 )
 #define UART2_NOTIF_BYTE_RECEIVED           ( 1 << 2 )
@@ -96,7 +106,7 @@ static void system_init( void *pvParameters )
         pm_set_wakeup_mode(true);
 
         /* Set the desired sleep mode. */
-        pm_sleep_mode_set(pm_mode_extended_sleep);
+        pm_sleep_mode_set(pm_mode_active);
 
         /* Set the desired wakeup mode. */
         pm_set_sys_wakeup_mode(pm_sys_wakeup_mode_fast);
@@ -134,7 +144,7 @@ static void system_init( void *pvParameters )
                         NULL,                                           /* The parameter passed to the task. */
                         configMINIMAL_STACK_SIZE * OS_STACK_WORD_SIZE,  /* The number of bytes to allocate to the
                                                                            stack of the task. */
-                        OS_TASK_PRIORITY_LOWEST,                        /* The priority assigned to the task. */
+                        OS_TASK_PRIORITY_NORMAL,                        /* The priority assigned to the task. */
                         uart_test_task_h );                             /* The task handle */
         OS_ASSERT(uart_test_task_h);                                    /* Check that the task created OK */
 
@@ -228,6 +238,7 @@ static void prv_Uart1_echo_Task( void *pvParameters )
  */
 void uart2_write_arync_cb(void *user_data, uint16_t transferred)
 {
+
         OS_TASK task_h = (OS_TASK)user_data;
 
         OS_TASK_NOTIFY_FROM_ISR(task_h, UART2_NOTIF_BYTE_SENT, OS_NOTIFY_SET_BITS);
@@ -241,7 +252,8 @@ void uart2_write_arync_cb(void *user_data, uint16_t transferred)
 static void prv_Uart2_async_TX_Task( void *pvParameters )
 {
         char c=0;
-        OS_BASE_TYPE ret __UNUSED;
+        //OS_BASE_TYPE ret __UNUSED;
+        volatile OS_BASE_TYPE ret;
         uint32_t notif;
 
         if (uart2_h == NULL) {
@@ -258,7 +270,15 @@ static void prv_Uart2_async_TX_Task( void *pvParameters )
                                                                         /* Wait for one char asynchronously TX */
                 if (ret == AD_UART_ERROR_NONE) {                        /* if the async write successfully issued */
                         ret = OS_TASK_NOTIFY_WAIT(0, OS_TASK_NOTIFY_ALL_BITS, &notif, OS_TASK_NOTIFY_FOREVER);
-                                                                        /*       wait to be notified from the callback */
+
+                        if(!ret){                                                                        /*       wait to be notified from the callback */
+                               ASSERT_WARNING(0);
+                        }
+
+                }
+                else
+                {
+                        ASSERT_WARNING(0);
                 }
 
         } while ( c != 27 );                                              /* Exit the task if received ESC character (ASCII=27) */
@@ -309,6 +329,7 @@ static void prv_Uart2_async_RX_Task( void *pvParameters )
         ASSERT_ERROR(uart2_h != NULL);                                  /* Check if the UART2 opened with success */
 
         do {
+
                 ret = ad_uart_read_async(uart2_h, &c, 1, uart2_read_arync_cb, OS_GET_CURRENT_TASK());
                                                                         /* Wait for one char asynchronously RX*/
                 if (ret == AD_UART_ERROR_NONE) {                        /* if the async read successfully issued */
@@ -319,6 +340,7 @@ static void prv_Uart2_async_RX_Task( void *pvParameters )
                                 OS_QUEUE_PUT(uart2_Q, &c, OS_QUEUE_FOREVER);    /*       then write back the char to UART (echo) */
                         }
                 }
+
         } while( c != 27 );                                               /* Exit the task if received ESC character (ASCII=27) */
 
 #endif
@@ -369,6 +391,18 @@ static void periph_init(void)
          * The UART configuration is in the platform_devices.c and the necessary declarations
          * of the three UART configuration instances are in the platform_devices.h
          */
+        hw_gpio_reserve_and_configure_pin(CURSOR_PORT, CURSOR_RX, HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, false);
+        hw_gpio_pad_latch_enable(CURSOR_PORT, CURSOR_RX);
+        hw_gpio_reserve_and_configure_pin(CURSOR_PORT, CURSOR_TX, HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, false);
+        hw_gpio_pad_latch_enable(CURSOR_PORT, CURSOR_TX);
+
+        hw_gpio_reserve_and_configure_pin(CURSOR_PORT, CURSOR_RX_INT, HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, false);
+        hw_gpio_pad_latch_enable(CURSOR_PORT, CURSOR_RX_INT);
+        hw_gpio_reserve_and_configure_pin(CURSOR_PORT, CURSOR_TX_INT, HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, false);
+        hw_gpio_pad_latch_enable(CURSOR_PORT, CURSOR_TX_INT);
+
+        hw_gpio_reserve_and_configure_pin(CURSOR_PORT, CURSOR_ISSUE, HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, false);
+        hw_gpio_pad_latch_enable(CURSOR_PORT, CURSOR_ISSUE);
 }
 
 /**

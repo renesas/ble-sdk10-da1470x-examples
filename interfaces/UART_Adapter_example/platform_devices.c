@@ -28,8 +28,8 @@ const ad_uart_io_conf_t uart1_io_conf = {
         /* UART RX pin configuration */
         .rx = {
                 /* RX pin configuration selection */
-                .port = HW_GPIO_PORT_2,
-                .pin = HW_GPIO_PIN_1,
+                .port = HW_GPIO_PORT_1,
+                .pin = HW_GPIO_PIN_8,
                 /* RX pin configuration when device is active ('On') */
                 {
                         .mode = HW_GPIO_MODE_INPUT_PULLUP,
@@ -47,8 +47,8 @@ const ad_uart_io_conf_t uart1_io_conf = {
         /* UART TX pin configuration */
         .tx = {
                 /* TX pin configuration selection */
-                .port = HW_GPIO_PORT_0,
-                .pin = HW_GPIO_PIN_8,
+                .port = HW_GPIO_PORT_1,
+                .pin = HW_GPIO_PIN_9,
                 /* TX pin configuration when device is active ('On') */
                 {
                         .mode = HW_GPIO_MODE_OUTPUT,
@@ -105,8 +105,8 @@ const ad_uart_io_conf_t uart2_io_conf = {
         /* UART RX pin configuration */
         .rx = {
                 /* RX pin configuration selection */
-                .port = HW_GPIO_PORT_1,
-                .pin = HW_GPIO_PIN_8,
+                .port = HW_GPIO_PORT_2,
+                .pin = HW_GPIO_PIN_1,
                 /* RX pin configuration when device is active ('On') */
                 {
                         .mode = HW_GPIO_MODE_INPUT_PULLUP,
@@ -123,8 +123,8 @@ const ad_uart_io_conf_t uart2_io_conf = {
         /* UART TX pin configuration */
         .tx = {
                 /* TX pin configuration selection */
-                .port = HW_GPIO_PORT_1,
-                .pin = HW_GPIO_PIN_9,
+                .port = HW_GPIO_PORT_0,
+                .pin = HW_GPIO_PIN_8,
                 /* TX pin configuration when device is active ('On') */
                 {
                         .mode = HW_GPIO_MODE_OUTPUT,
@@ -143,8 +143,8 @@ const ad_uart_io_conf_t uart2_io_conf = {
          * do not include it in case CTS/RTS is not used to save some GPIOS
          * for other purpose */
         .rtsn = {
-                .port = HW_GPIO_PORT_1,
-                .pin = HW_GPIO_PIN_6,
+                .port = HW_GPIO_PORT_0,
+                .pin = HW_GPIO_PIN_29,
                 /* RSTN pin configuration when device is active ('On') */
                 {
                         .mode = HW_GPIO_MODE_OUTPUT,
@@ -163,8 +163,8 @@ const ad_uart_io_conf_t uart2_io_conf = {
          * do not include it in case CTS/RTS is not used to save some GPIOS
          * for other purpose */
         .ctsn = {
-                .port = HW_GPIO_PORT_1,
-                .pin = HW_GPIO_PIN_7,
+                .port = HW_GPIO_PORT_0,
+                .pin = HW_GPIO_PIN_11,
                 /* CSTN pin configuration when device is active ('On') */
                 {
                         .mode = HW_GPIO_MODE_INPUT_PULLUP,
@@ -195,7 +195,7 @@ const ad_uart_driver_conf_t uart2_uart_driver_conf = {
                                                          *     NOTE: UART1 does not have RTS/CTS capabilities
                                                          *           RTS/CTS can be used only with UART2/UART3 */
                 .use_fifo = 1,                          /* Enable/Disable the use of the UART HW FIFO */
-                .use_dma = 1,                           /* Enable/Disable the use of DMA for UART transfers. */
+                .use_dma = 0,                           /* Enable/Disable the use of DMA for UART transfers. */
                 .tx_dma_channel = HW_DMA_CHANNEL_3,     /* If DMA is used, select the DMA channels to use for RX/TX */
                 .rx_dma_channel = HW_DMA_CHANNEL_2,     /* The DMA is activated only for transfers >=2 bytes */
                 .tx_fifo_tr_lvl = 0,                    /* Set the TX FIFO threshold level for generating the threshold interrupts */
@@ -275,7 +275,7 @@ const ad_uart_io_conf_t uart3_io_conf = {
          * do not include it in case CTS/RTS is not used to save some GPIOS
          * for other purpose */
         .ctsn = {
-                .port = HW_GPIO_PORT_0,
+                .port = HW_GPIO_PORT_1,
                 .pin = HW_GPIO_PIN_29,
                 /* CSTN pin configuration when device is active ('On') */
                 {
