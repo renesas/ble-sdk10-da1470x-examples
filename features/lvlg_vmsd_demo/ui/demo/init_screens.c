@@ -99,7 +99,7 @@ static void scroll_event_cb(lv_event_t *e)
 #if TWO_LAYERS_HORIZONTAL_SLIDING
         static int position = 0;
         int posXLayer0 = 0, posXLayer1 = DEMO_RESX;
-        lv_dir_t dir = LV_DIR_NONE;
+        static lv_dir_t dir = LV_DIR_NONE;
 #endif
 
         if (code == LV_EVENT_SCROLL_BEGIN || code == LV_EVENT_SCROLL
@@ -131,25 +131,11 @@ static void scroll_event_cb(lv_event_t *e)
                         /* 2 Layers sliding */
                         position += scroll_dx;
 
-                        if (scroll_dx < 0) {
-                                if (prev_sx >= DEMO_RESX) {
-                                        // watch -> nothing, Layer position remains the same
-                                        posXLayer0 = DEMO_RESX;
-                                }
-                                else {
-                                        // watch -> menu, change Layer position
-                                        posXLayer0 = DEMO_RESX + position;
-                                }
+                        if (dir == LV_DIR_RIGHT) {
+                                posXLayer0 = DEMO_RESX + position;
                         }
-                        else {
-                                if (prev_sx <= 0) {
-                                        // menu -> nothing, Layer position remains the same
-                                        posXLayer0 = -DEMO_RESX;
-                                }
-                                else {
-                                        // menu -> watch, change Layer position
-                                        posXLayer0 = position - DEMO_RESX;
-                                }
+                        else if (dir == LV_DIR_LEFT) {
+                                posXLayer0 = position - DEMO_RESX;
                         }
                         posXLayer1 = position;
 
