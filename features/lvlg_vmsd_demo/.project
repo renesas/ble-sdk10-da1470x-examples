@@ -40,6 +40,11 @@
 			<locationURI>SDKROOT/sdk/middleware/adapters</locationURI>
 		</link>
 		<link>
+			<name>sdk/ble</name>
+			<type>2</type>
+			<locationURI>SDKROOT/sdk/interfaces/ble</locationURI>
+		</link>
+		<link>
 			<name>sdk/bsp_include</name>
 			<type>2</type>
 			<locationURI>SDKROOT/sdk/bsp/include</locationURI>
@@ -58,6 +63,11 @@
 			<name>sdk/gpu</name>
 			<type>2</type>
 			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>sdk/intrinsic</name>
+			<type>2</type>
+			<location>C:/Workspace/LPC_CS_DA1470x_SDK_10/sdk/middleware/intrinsic</location>
 		</link>
 		<link>
 			<name>sdk/ldscripts</name>

@@ -18,6 +18,12 @@
 
 #include "osal.h"
 #include "resmgmt.h"
+
+#include "ad_ble.h"
+#include "ad_nvms.h"
+#include "ad_nvparam.h"
+#include "ble_mgr.h"
+
 #include "hw_cpm.h"
 #include "hw_gpio.h"
 #include "hw_sys.h"
@@ -40,6 +46,7 @@
  * \brief Button task priority
  */
 #define LCDC_DEMO_TASK_PRIORITY         (OS_TASK_PRIORITY_NORMAL)
+#define mainPXP_REPORTER_TASK_PRIORITY  ( OS_TASK_PRIORITY_NORMAL )
 
 /**
  * \brief Task handler
@@ -68,6 +75,9 @@ void MainTask(void);
  * memory, etc. are configured before main() is called.
  */
 static void prvSetupHardware(void);
+
+OS_TASK_FUNCTION(pxp_reporter_task, pvParameters);
+
 /*
  * System Initialization function.
  *
@@ -80,6 +90,8 @@ static void system_init(void *pvParameters)
 #if defined CONFIG_RETARGET
         extern void retarget_init(void);
 #endif
+
+        OS_TASK handle;
         sys_clk_t sys_clk_prio[5] = {
                 sysclk_PLL160,
                 sysclk_RCHS_96,
@@ -117,8 +129,11 @@ static void system_init(void *pvParameters)
 
         /* Set the desired sleep mode */
         pm_set_wakeup_mode(true);
-        pm_sleep_mode_set(pm_mode_extended_sleep);
+        pm_sleep_mode_set(pm_mode_active);
         sys_usb_init();
+
+        /* Initialize BLE Manager */
+        ble_mgr_init();
 
 #if defined CONFIG_RETARGET
         retarget_init();
@@ -134,6 +149,24 @@ static void system_init(void *pvParameters)
 #endif
 
         printf("Watch demo\r\nInitializing task...\r\n");
+
+        /* Start the PXP reporter application task */
+        OS_TASK_CREATE("PXP Reporter",                  /* The text name assigned to the task, for
+                                                           debug only; not used by the kernel. */
+                       pxp_reporter_task,               /* The function that implements the task. */
+                       NULL,                            /* The parameter passed to the task. */
+#if (dg_configDISABLE_BACKGROUND_FLASH_OPS == 1)
+                       512,                             /* The number of bytes to allocate to the
+                                                           stack of the task. */
+#else
+                       756,                             /* The number of bytes to allocate to the
+                                                           stack of the task. */
+#endif
+                       mainPXP_REPORTER_TASK_PRIORITY,  /* The priority assigned to the task. */
+                       handle);                         /* The task handle. */
+        OS_ASSERT(handle);
+
+
         MainTask();
 #ifdef PERFORMANCE_METRICS
         UISimulationTask();
