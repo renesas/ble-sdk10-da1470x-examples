@@ -20,6 +20,8 @@
 /* Should be enabled for untrimmed/T0/T0- samples in custom configuration file */
 #define TEST_WITH_UNTRIMMED_SILICON             ( 0 )
 
+#define CONFIG_USE_BLE
+
 #define CONFIG_RETARGET
 
 #if DEVICE_FPGA
@@ -34,7 +36,7 @@
 #define dg_configMEM_RETENTION_MODE             (0x1F)
 #define dg_configSHUFFLING_MODE                 (0x3)
 
-#define dg_configUSE_WDOG                       (0)
+#define dg_configUSE_WDOG                       (1)
 
 #define dg_configFLASH_CONNECTED_TO             (FLASH_CONNECTED_TO_1V8)
 
@@ -63,18 +65,19 @@
 #define OS_FREERTOS                             /* Define this to use FreeRTOS */
 #define configTOTAL_HEAP_SIZE                   ( 32 * 1024 )  /* FreeRTOS Total Heap Size */
 
-#define dg_configQSPI_CODE_SIZE_AA              (480 * 1024)  /* Includes CMI and SNC, def value 384*/
+#define dg_configQSPI_CODE_SIZE_AA              (768 * 1024) //(480 * 1024)  /* Includes CMI and SNC, def value 384*/
 
 /*************************************************************************************************\
  * Peripheral specific config
  */
 
+#define dg_configGPADC_ADAPTER                  (1)
 
 #define dg_configFLASH_ADAPTER                  (1)
 #define dg_configCRYPTO_ADAPTER                 (0)
 #define dg_configNVMS_ADAPTER                   (1)
 #define dg_configNVMS_VES                       (1)
-#define dg_configRF_ENABLE_RECALIBRATION        (0)
+#define dg_configRF_ENABLE_RECALIBRATION        (1)
 
 #ifdef CONFIG_RETARGET
 #define dg_configUSE_HW_DMA                     (1)
@@ -92,6 +95,23 @@
 
 #define dg_configUSE_HW_QSPI2                    ( 1 )
 #define dg_configQSPIC2_DEV_AUTODETECT           ( 1 )
+
+/*************************************************************************************************\
+ * BLE configuration
+ */
+#define CONFIG_USE_BLE_SERVICES
+
+#define dg_configBLE_CENTRAL                    ( 0 )
+#define dg_configBLE_GATT_CLIENT                ( 0 )
+#define dg_configBLE_OBSERVER                   ( 0 )
+#define dg_configBLE_BROADCASTER                ( 0 )
+#define dg_configBLE_L2CAP_COC                  ( 0 )
+
+#define defaultBLE_ATT_DB_CONFIGURATION         ( 0x10 )  // Peripheral Pref. Conn. Param. attribute
+#define defaultBLE_PPCP_INTERVAL_MIN            ( BLE_CONN_INTERVAL_FROM_MS( 500 ) )    // 500 ms
+#define defaultBLE_PPCP_INTERVAL_MAX            ( BLE_CONN_INTERVAL_FROM_MS( 750 ) )    // 750 ms
+#define defaultBLE_PPCP_SLAVE_LATENCY           ( 0 )                                   // 0 events
+#define defaultBLE_PPCP_SUP_TIMEOUT             ( BLE_SUPERVISION_TMO_FROM_MS( 6000 ) ) // 6000 ms
 
 /*************************************************************************************************\
  * Display model selection. Note that one display model can be selected at a time.

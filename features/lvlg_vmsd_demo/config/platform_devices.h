@@ -23,6 +23,14 @@
 extern "C" {
 #endif
 
+#if (dg_configGPADC_ADAPTER == 1)
+
+/*
+ * Define sources connected to GPADC
+ */
+
+#endif /* dg_configGPADC_ADAPTER */
+
 #if dg_configLCDC_ADAPTER
 #if dg_configUSE_H13TB18A
 extern const ad_lcdc_io_conf_t h13tb18a_io;

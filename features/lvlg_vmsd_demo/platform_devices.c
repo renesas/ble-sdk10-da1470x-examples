@@ -16,6 +16,7 @@
 #include "ad_lcdc.h"
 #include "peripheral_setup.h"
 #include "platform_devices.h"
+#include "ad_gpadc.h"
 
 /*
  * PLATFORM PERIPHERALS GPIO CONFIGURATION
@@ -500,6 +501,33 @@ const ad_i2c_io_conf_t zt2628_io = {
         .voltage_level = HW_GPIO_POWER_V33
 };
 #endif /* dg_configUSE_ZT2628 */
+
+#if (dg_configGPADC_ADAPTER == 1)
+
+/*
+ * Define sources connected to GPADC
+ */
+
+
+const ad_gpadc_driver_conf_t battery_level_driver = {
+        .input_attenuator       = HW_GPADC_INPUT_VOLTAGE_UP_TO_0V9,
+        .positive               = HW_GPADC_INPUT_SE_VBAT,
+        .result_mode            = HW_GPADC_RESULT_NORMAL,
+        .input_mode             = HW_GPADC_INPUT_MODE_SINGLE_ENDED,
+        .temp_sensor            = HW_GPADC_NO_TEMP_SENSOR,
+        .sample_time            = 15,
+        .chopping               = true,
+        .oversampling           = HW_GPADC_OVERSAMPLING_4_SAMPLES,
+};
+
+const ad_gpadc_controller_conf_t BATTERY_LEVEL = {
+        HW_GPADC_1,
+        NULL,
+        &battery_level_driver
+};
+
+
+#endif /* dg_configGPADC_ADAPTER */
 
 /*
  * PLATFORM PERIPHERALS CONTROLLER CONFIGURATION
