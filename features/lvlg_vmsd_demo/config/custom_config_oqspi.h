@@ -57,7 +57,7 @@
 
 #define dg_configUSE_SW_CURSOR                  (1)
 
-#define dg_configUSE_SYS_TRNG                   (0)
+#define dg_configUSE_SYS_TRNG                   (1)
 
 /*************************************************************************************************\
  * FreeRTOS configuration

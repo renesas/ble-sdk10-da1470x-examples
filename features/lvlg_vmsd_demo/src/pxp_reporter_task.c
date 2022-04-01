@@ -12,6 +12,7 @@
  ****************************************************************************************
  */
 
+#include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
 #include "osal.h"
@@ -30,7 +31,8 @@
 #include "ad_nvparam.h"
 #include "ad_gpadc.h"
 #include "hw_gpio.h"
-
+#include "sys_trng.h"
+#include "sys_drbg.h"
 
 #include "hw_led.h"
 
@@ -227,6 +229,26 @@ static void led_blink_tim_cb(OS_TIMER timer)
         OS_TASK_NOTIFY(task, BLINK_TMO_NOTIF, OS_NOTIFY_SET_BITS);
 }
 
+void print_own_address(void) {
+
+        own_address_t addr;
+
+
+        ble_gap_address_get(&addr);
+        printf("\r\nDevice address: ");
+        for(int i= sizeof(addr.addr) - 1;i >=0;i--) {
+                printf("%02X",addr.addr[i]);
+                if(i != 0){
+                        printf(":");
+                } else {
+                        printf("\r\n\r\n");
+                }
+
+        }
+        fflush(stdout);
+
+
+}
 
 static void led_toggle(void)
 {
@@ -708,6 +730,19 @@ OS_TASK_FUNCTION(pxp_reporter_task, params)
         /* Get device name from NVPARAM if valid or use default otherwise */
         name_len = read_name(MAX_NAME_LEN, name_buf);
 
+        own_address_t addr = {
+                .addr_type = PRIVATE_STATIC_ADDRESS,
+                .addr[4] = 0x34,
+                .addr[5] = 0xFA,
+        };
+
+
+        sys_drbg_read_rand(&addr.addr);
+
+        ble_gap_address_set(&addr, 0x7530); // 5 min
+
+        sprintf(&name_buf[name_len - 4],"%02X%02X",addr.addr[1],addr.addr[0]);
+
         /* Set device name */
         ble_gap_device_name_set(name_buf, ATT_PERM_READ);
 
@@ -786,6 +821,15 @@ OS_TASK_FUNCTION(pxp_reporter_task, params)
         ble_gap_adv_start(GAP_CONN_MODE_UNDIRECTED);
         OS_TIMER_START(adv_tim, OS_TIMER_FOREVER);
 
+        do_alert(0);
+
+         printf("\r\n#######################\r\n");
+         printf("DA1470x Proximity reporter\r\n");
+         printf("#######################\r\n");
+
+         fflush(stdout);
+
+         print_own_address();
 
 #if (PX_REPORTER_INCLUDE_BAS == 1)
 
