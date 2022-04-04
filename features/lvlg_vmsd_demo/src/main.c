@@ -150,6 +150,8 @@ static void system_init(void *pvParameters)
 
         printf("Watch demo\r\nInitializing task...\r\n");
 
+
+
         /* Start the PXP reporter application task */
         OS_TASK_CREATE("PXP Reporter",                  /* The text name assigned to the task, for
                                                            debug only; not used by the kernel. */
@@ -365,12 +367,13 @@ static void prvSetupHardware(void)
 
         ad_pmu_configure_rail(PMU_RAIL_1V8, &v18_rail_config);
 
+        /* Make sure PD_COM is enabled before configuring any GPIO pin */
+        hw_sys_pd_com_enable();
+
+
 #if dg_configUSE_HW_WKUP && defined(TOUCH_INT_PORT) && !dg_configUSE_TOUCH_SIMULATION
         /* Setup interrupt for external sources */
         _wkup_init();
-
-        /* Make sure PD_COM is enabled before configuring any GPIO pin */
-        hw_sys_pd_com_enable();
 
         hw_gpio_set_pin_function(TOUCH_INT_PORT, TOUCH_INT_PIN, TOUCH_INT_MODE, HW_GPIO_FUNC_GPIO);
         /* Latch/activate IO pin */
@@ -382,9 +385,23 @@ static void prvSetupHardware(void)
         HW_GPIO_PAD_LATCH_ENABLE(KEY1);
         HW_GPIO_PAD_LATCH_DISABLE(KEY1);
 
-        /* Disable PD_COM after configuring all GPIO pins */
-        hw_sys_pd_com_disable();
 #endif /* dg_configUSE_HW_WKUP && defined(TOUCH_INT_PORT) && !dg_configUSE_TOUCH_SIMULATION */
+
+
+
+        hw_gpio_configure_pin_power(HW_GPIO_PORT_1, HW_GPIO_PIN_7, HW_GPIO_POWER_V33);
+        /* GPIO to activate the LCD LDO and power up after boot */
+        //hw_gpio_configure_pin(HW_GPIO_PORT_1, HW_GPIO_PIN_7, HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, true);
+        hw_gpio_set_pin_function(HW_GPIO_PORT_1, HW_GPIO_PIN_7, HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO);
+
+        /* Activate LCD board LDO (power)  */
+
+        hw_gpio_set_active(HW_GPIO_PORT_1, HW_GPIO_PIN_7);
+        hw_gpio_pad_latch_enable(HW_GPIO_PORT_1, HW_GPIO_PIN_7);
+        hw_gpio_pad_latch_disable(HW_GPIO_PORT_1, HW_GPIO_PIN_7);
+
+        hw_sys_pd_com_disable();
+
 
 #if dg_configLCDC_ADAPTER
 
