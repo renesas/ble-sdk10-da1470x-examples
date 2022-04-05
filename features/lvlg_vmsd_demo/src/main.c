@@ -106,6 +106,8 @@ static void system_init(void *pvParameters)
         cm_ahb_set_clock_divider(ahb_div1);
         cm_lp_clk_init();
 
+        REG_SETF(CRG_VSYS, VSYS_GEN_CTRL_REG, CURLIM_SET, 0x66);
+
         /* Initialize platform watchdog */
         sys_watchdog_init();
 
@@ -150,7 +152,11 @@ static void system_init(void *pvParameters)
 
         printf("Watch demo\r\nInitializing task...\r\n");
 
+        hw_gpio_set_active(HW_GPIO_PORT_1, HW_GPIO_PIN_7);
+        hw_gpio_pad_latch_enable(HW_GPIO_PORT_1, HW_GPIO_PIN_7);
+        hw_gpio_pad_latch_disable(HW_GPIO_PORT_1, HW_GPIO_PIN_7);
 
+        OS_DELAY_MS(100);
 
         /* Start the PXP reporter application task */
         OS_TASK_CREATE("PXP Reporter",                  /* The text name assigned to the task, for
@@ -396,9 +402,9 @@ static void prvSetupHardware(void)
 
         /* Activate LCD board LDO (power)  */
 
-        hw_gpio_set_active(HW_GPIO_PORT_1, HW_GPIO_PIN_7);
-        hw_gpio_pad_latch_enable(HW_GPIO_PORT_1, HW_GPIO_PIN_7);
-        hw_gpio_pad_latch_disable(HW_GPIO_PORT_1, HW_GPIO_PIN_7);
+//        hw_gpio_set_active(HW_GPIO_PORT_1, HW_GPIO_PIN_7);
+//        hw_gpio_pad_latch_enable(HW_GPIO_PORT_1, HW_GPIO_PIN_7);
+//        hw_gpio_pad_latch_disable(HW_GPIO_PORT_1, HW_GPIO_PIN_7);
 
         hw_sys_pd_com_disable();
 
