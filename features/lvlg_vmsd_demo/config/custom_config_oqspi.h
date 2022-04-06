@@ -63,7 +63,7 @@
  * FreeRTOS configuration
  */
 #define OS_FREERTOS                             /* Define this to use FreeRTOS */
-#define configTOTAL_HEAP_SIZE                   ( 32 * 1024 )  /* FreeRTOS Total Heap Size */
+#define configTOTAL_HEAP_SIZE                   (36 * 1024)  //( 32 * 1024 )  /* FreeRTOS Total Heap Size */
 
 #define dg_configQSPI_CODE_SIZE_AA              (768 * 1024) //(480 * 1024)  /* Includes CMI and SNC, def value 384*/
 
