@@ -597,93 +597,21 @@
     	
     <storageModule moduleId="cdtBuildSystem" version="4.0.0">
         		
-        <project id="ble_peripheral.null.1536552500" name="ble_peripheral"/>
+        <project id="ble_custom_service_example.null.1536552500" name="ble_custom_service_example"/>
         	
     </storageModule>
     	
     <storageModule moduleId="refreshScope" versionNumber="2">
         		
-        <configuration configurationName="D2798-00-Debug_RAM">
-            			
-            <resource resourceType="PROJECT" workspacePath="/ble_peripheral"/>
-            		
-        </configuration>
-        		
-        <configuration configurationName="DA1469x-00-Release_QSPI">
-            			
-            <resource resourceType="PROJECT" workspacePath="/ble_peripheral"/>
-            		
-        </configuration>
-        		
-        <configuration configurationName="D2798-00-Debug_OQSPI">
-            			
-            <resource resourceType="PROJECT" workspacePath="/ble_peripheral"/>
-            		
-        </configuration>
-        		
-        <configuration configurationName="D2522-00-Debug_QSPI">
-            			
-            <resource resourceType="PROJECT" workspacePath="/ble_peripheral"/>
-            		
-        </configuration>
-        		
-        <configuration configurationName="DA14683-00-Release_QSPI">
-            			
-            <resource resourceType="PROJECT" workspacePath="/ble_peripheral"/>
-            		
-        </configuration>
-        		
-        <configuration configurationName="D2522-00-Release_QSPI">
-            			
-            <resource resourceType="PROJECT" workspacePath="/ble_peripheral"/>
-            		
-        </configuration>
-        		
-        <configuration configurationName="DA14681-01-Debug_QSPI">
-            			
-            <resource resourceType="PROJECT" workspacePath="/ble_peripheral"/>
-            		
-        </configuration>
-        		
-        <configuration configurationName="DA1469x-00-Release_RAM">
-            			
-            <resource resourceType="PROJECT" workspacePath="/ble_peripheral"/>
-            		
-        </configuration>
-        		
-        <configuration configurationName="DA14683-00-Debug_QSPI">
-            			
-            <resource resourceType="PROJECT" workspacePath="/ble_peripheral"/>
-            		
-        </configuration>
-        		
         <configuration configurationName="DA1470x-00-Debug_RAM">
             			
-            <resource resourceType="PROJECT" workspacePath="/ble_peripheral"/>
-            		
-        </configuration>
-        		
-        <configuration configurationName="DA1469x-00-Debug_RAM">
-            			
-            <resource resourceType="PROJECT" workspacePath="/ble_peripheral"/>
+            <resource resourceType="PROJECT" workspacePath="/ble_custom_service_example"/>
             		
         </configuration>
         		
         <configuration configurationName="DA1470x-00-Debug_OQSPI">
             			
-            <resource resourceType="PROJECT" workspacePath="/ble_peripheral"/>
-            		
-        </configuration>
-        		
-        <configuration configurationName="DA1469x-00-Debug_QSPI">
-            			
-            <resource resourceType="PROJECT" workspacePath="/ble_peripheral"/>
-            		
-        </configuration>
-        		
-        <configuration configurationName="DA14681-01-Release_QSPI">
-            			
-            <resource resourceType="PROJECT" workspacePath="/ble_peripheral"/>
+            <resource resourceType="PROJECT" workspacePath="/ble_custom_service_example"/>
             		
         </configuration>
         	
