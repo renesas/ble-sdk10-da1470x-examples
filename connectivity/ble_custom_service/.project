@@ -118,7 +118,7 @@
 	<variableList>
 		<variable>
 			<name>SDKROOT</name>
-			<value>$%7BPARENT-4-PROJECT_LOC%7D</value>
+			<value>$%7BWORKSPACE_LOC%7D</value>
 		</variable>
 	</variableList>
 </projectDescription>
