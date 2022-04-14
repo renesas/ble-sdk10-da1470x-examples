@@ -16,7 +16,7 @@
 #define PXP_REPORTER_CONFIG_H_
 
 /* Name can not be longer than 29 bytes (BLE_SCAN_RSP_LEN_MAX - 2 bytes)*/
-#define PX_REPORTER_DEFAULT_NAME        "Dialog PX Reporter"
+#define PX_REPORTER_DEFAULT_NAME        "Renesas PX Reporterxxxx"
 
 /* Interval (in ms) for checking battery level (can be configured externally as well) */
 #ifndef PX_REPORTER_BATTERY_CHECK_INTERVAL
