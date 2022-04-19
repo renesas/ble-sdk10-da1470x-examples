@@ -195,7 +195,7 @@ const ad_uart_driver_conf_t uart2_uart_driver_conf = {
                                                          *     NOTE: UART1 does not have RTS/CTS capabilities
                                                          *           RTS/CTS can be used only with UART2/UART3 */
                 .use_fifo = 1,                          /* Enable/Disable the use of the UART HW FIFO */
-                .use_dma = 0,                           /* Enable/Disable the use of DMA for UART transfers. */
+                .use_dma = 1,                           /* Enable/Disable the use of DMA for UART transfers. */
                 .tx_dma_channel = HW_DMA_CHANNEL_3,     /* If DMA is used, select the DMA channels to use for RX/TX */
                 .rx_dma_channel = HW_DMA_CHANNEL_2,     /* The DMA is activated only for transfers >=2 bytes */
                 .tx_fifo_tr_lvl = 0,                    /* Set the TX FIFO threshold level for generating the threshold interrupts */
