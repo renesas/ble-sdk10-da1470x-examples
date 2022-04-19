@@ -29,14 +29,6 @@
 
 #include "hw_gpio.h"
 
-#define CURSOR_PORT                             HW_GPIO_PORT_1
-#define CURSOR_RX                               HW_GPIO_PIN_10
-#define CURSOR_TX                               HW_GPIO_PIN_11
-#define CURSOR_RX_INT                           HW_GPIO_PIN_12
-#define CURSOR_TX_INT                           HW_GPIO_PIN_7
-#define CURSOR_ISSUE                            HW_GPIO_PIN_6
-
-
 #define UART2_NOTIF_BYTE_SENT               ( 1 << 0 )
 #define UART2_NOTIF_BYTE_NOT_SENT           ( 1 << 1 )
 #define UART2_NOTIF_BYTE_RECEIVED           ( 1 << 2 )
@@ -71,8 +63,11 @@ static void prvSetupHardware( void );
  *               and creates the uart_test_task task which which actually uses all three UARTs.
  *               The system_init runs once and exits when finishes its work.
  */
-static void system_init( void *pvParameters )
+//static void system_init( void *pvParameters )
+static OS_TASK_FUNCTION(system_init, pvParameters)
 {
+        OS_TASK_BEGIN();
+
         OS_TASK uart_test_task_h = NULL;
 
 #if defined CONFIG_RETARGET
@@ -85,10 +80,10 @@ static void system_init( void *pvParameters )
         cm_ahb_set_clock_divider(ahb_div1);
         cm_lp_clk_init();
 
-#if dg_configUSE_WDOG
         /* Initialize platform watchdog */
         sys_watchdog_init();
 
+#if dg_configUSE_WDOG
         /* Register the Idle task first */
         idle_task_wdog_id = sys_watchdog_register(false);
         ASSERT_WARNING(idle_task_wdog_id != -1);
@@ -106,7 +101,7 @@ static void system_init( void *pvParameters )
         pm_set_wakeup_mode(true);
 
         /* Set the desired sleep mode. */
-        pm_sleep_mode_set(pm_mode_active);
+        pm_sleep_mode_set(pm_mode_extended_sleep);
 
         /* Set the desired wakeup mode. */
         pm_set_sys_wakeup_mode(pm_sys_wakeup_mode_fast);
@@ -163,6 +158,8 @@ static void system_init( void *pvParameters )
         /* the work of the SysInit task is done
          * The task will be terminated */
         OS_TASK_DELETE( OS_GET_CURRENT_TASK() );
+
+        OS_TASK_END();
 }
 
 /**
@@ -206,17 +203,32 @@ int main( void )
  * @brief UART 1 echo task without UART flow control.
  *        The task reads a character on RX and sends it back on TX
  */
-static void prv_Uart1_echo_Task( void *pvParameters )
+OS_TASK_FUNCTION(prv_Uart1_echo_Task, pvParameters)
 {
+        OS_TASK_BEGIN();
+
         char c=0;
         uint32_t bytes;
         ad_uart_handle_t uart1_h;
+
+#if dg_configUSE_WDOG
+        int8_t wakeup_task_wdog_id = -1;
+        wakeup_task_wdog_id = sys_watchdog_register(false);
+        ASSERT_WARNING(wakeup_task_wdog_id != -1);
+#endif
 
         uart1_h = ad_uart_open(&uart1_uart_conf);                               /* Open the UART with the desired configuration    */
         ASSERT_ERROR(uart1_h != NULL);                                          /* Check if the UART1 opened OK */
 
         do {
+                /* Suspend watchdog while blocking on getting 1 character */
+                sys_watchdog_suspend(wakeup_task_wdog_id);
+
                 bytes = ad_uart_read(uart1_h, &c, 1, OS_EVENT_FOREVER);         /* Wait for one char synchronously                 */
+
+                /* Trigger the watchdog notification */
+                sys_watchdog_notify_and_resume(wakeup_task_wdog_id);
+
                 if (bytes > 0) {                                                /* if there is a successful read...                */
                         ad_uart_write(uart1_h, &c, bytes);                      /*       then write back the char to UART (echo)   */
                 }
@@ -224,10 +236,16 @@ static void prv_Uart1_echo_Task( void *pvParameters )
 
         while (ad_uart_close(uart1_h, false) == AD_UART_ERROR_CONTROLLER_BUSY); /* Wait until the UART has finished all the transactions
                                                                                  * before exiting. */
+#if dg_configUSE_WDOG
+        sys_watchdog_unregister(wakeup_task_wdog_id);                           /* Unregister from watchdog before deleting the task */
+        wakeup_task_wdog_id = -1;
+#endif
 
         OS_TASK_DELETE( OS_GET_CURRENT_TASK() );                                /* Delete the task before exiting. It is not allowed in
                                                                                  * FreeRTOS a task to exit without being deleted from
                                                                                  * the OS's queues */
+
+        OS_TASK_END();
 }
 
 /**
@@ -249,12 +267,19 @@ void uart2_write_arync_cb(void *user_data, uint16_t transferred)
  *        Receives bytes from uart2_Q and send them to UART2 pins
  *        RTS/CTS flow control is used
  */
-static void prv_Uart2_async_TX_Task( void *pvParameters )
+OS_TASK_FUNCTION(prv_Uart2_async_TX_Task, pvParameters)
 {
+        OS_TASK_BEGIN();
+
         char c=0;
-        //OS_BASE_TYPE ret __UNUSED;
         volatile OS_BASE_TYPE ret;
         uint32_t notif;
+
+#if dg_configUSE_WDOG
+        int8_t wakeup_task_wdog_id = -1;
+        wakeup_task_wdog_id = sys_watchdog_register(false);
+        ASSERT_WARNING(wakeup_task_wdog_id != -1);
+#endif
 
         if (uart2_h == NULL) {
                 uart2_h = ad_uart_open(&uart2_uart_conf);               /* Open the UART2 only if is not opened by the other task. */
@@ -263,22 +288,28 @@ static void prv_Uart2_async_TX_Task( void *pvParameters )
         ASSERT_ERROR(uart2_h != NULL);                                  /* Check if the UART2 opened with success */
 
         do {
+                /* Suspend watchdog while blocking on reading the queue */
+                sys_watchdog_suspend(wakeup_task_wdog_id);
+
                 ret = OS_QUEUE_GET(uart2_Q , &c, OS_QUEUE_FOREVER);     /* Get a character from the Q. Task will be suspended if Q is empty */
+
+                /* Trigger the watchdog notification */
+                sys_watchdog_notify_and_resume(wakeup_task_wdog_id);
+
                 OS_ASSERT(ret == OS_OK);                                /* Check that the Q operation was OK */
 
                 ret = ad_uart_write_async(uart2_h, &c, 1, uart2_write_arync_cb, OS_GET_CURRENT_TASK());
                                                                         /* Wait for one char asynchronously TX */
                 if (ret == AD_UART_ERROR_NONE) {                        /* if the async write successfully issued */
+
+                        /* Suspend watchdog while blocking on waiting for the callback to occur */
+                        sys_watchdog_suspend(wakeup_task_wdog_id);
+
                         ret = OS_TASK_NOTIFY_WAIT(0, OS_TASK_NOTIFY_ALL_BITS, &notif, OS_TASK_NOTIFY_FOREVER);
+                                                                        /* wait to be notified from the callback */
 
-                        if(!ret){                                                                        /*       wait to be notified from the callback */
-                               ASSERT_WARNING(0);
-                        }
-
-                }
-                else
-                {
-                        ASSERT_WARNING(0);
+                        /* Trigger the watchdog notification */
+                        sys_watchdog_notify_and_resume(wakeup_task_wdog_id);
                 }
 
         } while ( c != 27 );                                              /* Exit the task if received ESC character (ASCII=27) */
@@ -287,9 +318,16 @@ static void prv_Uart2_async_TX_Task( void *pvParameters )
                                                                                  * before exiting. */
 
         OS_QUEUE_DELETE(uart2_Q);                                       /* Q is not needed anymore, so delete it */
+
+#if dg_configUSE_WDOG
+        sys_watchdog_unregister(wakeup_task_wdog_id);                           /* Unregister from watchdog before deleting the task */
+        wakeup_task_wdog_id = -1;
+#endif
+
         OS_TASK_DELETE( OS_GET_CURRENT_TASK() );                        /* Delete the task before exiting. It is not allowed in
                                                                          * FreeRTOS a task to exit without being deleted from
                                                                          * the OS's queues */
+        OS_TASK_END();
 }
 
 /**
@@ -315,12 +353,20 @@ void uart2_read_arync_cb(void *user_data, uint16_t transferred)
  *        Receives bytes from UART pins and put them in uart2_Q
  *        RTS/CTS flow control is used
  */
-static void prv_Uart2_async_RX_Task( void *pvParameters )
+OS_TASK_FUNCTION(prv_Uart2_async_RX_Task, pvParameters)
 {
+        OS_TASK_BEGIN();
+
 #if (dg_configUART_ADAPTER == 1)
         char c=0;
         OS_BASE_TYPE ret __UNUSED;
         uint32_t notif;
+
+#if dg_configUSE_WDOG
+        int8_t wakeup_task_wdog_id = -1;
+        wakeup_task_wdog_id = sys_watchdog_register(false);
+        ASSERT_WARNING(wakeup_task_wdog_id != -1);
+#endif
 
         if (uart2_h == NULL) {
                 uart2_h = ad_uart_open(&uart2_uart_conf);               /* Open the UART2 only if is not opened by the other task. */
@@ -331,23 +377,42 @@ static void prv_Uart2_async_RX_Task( void *pvParameters )
         do {
 
                 ret = ad_uart_read_async(uart2_h, &c, 1, uart2_read_arync_cb, OS_GET_CURRENT_TASK());
+
+                /* Suspend watchdog while blocking on reading the queue */
+                sys_watchdog_suspend(wakeup_task_wdog_id);
                                                                         /* Wait for one char asynchronously RX*/
                 if (ret == AD_UART_ERROR_NONE) {                        /* if the async read successfully issued */
                         ret = OS_TASK_NOTIFY_WAIT(0, OS_TASK_NOTIFY_ALL_BITS, &notif, OS_TASK_NOTIFY_FOREVER);
+
+                        /* Trigger the watchdog notification */
+                        sys_watchdog_notify_and_resume(wakeup_task_wdog_id);
+
                                                                         /*       wait to be notified from the callback */
                         OS_ASSERT(ret == OS_OK);                        /*       Check that the task resumed OK */
                         if (notif & UART2_NOTIF_BYTE_RECEIVED) {
+                                /* Suspend watchdog while blocking on placing data in the queue */
+                                sys_watchdog_suspend(wakeup_task_wdog_id);
+
                                 OS_QUEUE_PUT(uart2_Q, &c, OS_QUEUE_FOREVER);    /*       then write back the char to UART (echo) */
+
+                                /* Trigger the watchdog notification */
+                                sys_watchdog_notify_and_resume(wakeup_task_wdog_id);
                         }
                 }
 
-        } while( c != 27 );                                               /* Exit the task if received ESC character (ASCII=27) */
+        } while( c != 27 );                                             /* Exit the task if received ESC character (ASCII=27) */
 
+#endif
+
+#if dg_configUSE_WDOG
+        sys_watchdog_unregister(wakeup_task_wdog_id);                   /* Unregister from watchdog before deleting the task */
+        wakeup_task_wdog_id = -1;
 #endif
 
         OS_TASK_DELETE( OS_GET_CURRENT_TASK() );                        /* Delete the task before exiting. It is not allowed in
                                                                          * FreeRTOS a task to exit without being deleted from
                                                                          * the OS's queues */
+        OS_TASK_END();
 }
 
 
@@ -356,28 +421,51 @@ static void prv_Uart2_async_RX_Task( void *pvParameters )
  *        The task exits when ESC character (ASCII = 27) is received.
  *        The task is using synchronous read/write to UART
  */
-static void prv_Uart3_rts_cts_flow_ctrl_echo_Task( void *pvParameters )
+OS_TASK_FUNCTION(prv_Uart3_rts_cts_flow_ctrl_echo_Task, pvParameters)
 {
+        OS_TASK_BEGIN();
+
         char c=0;
         uint32_t bytes;
         ad_uart_handle_t uart3_h;
+
+#if dg_configUSE_WDOG
+        int8_t wakeup_task_wdog_id = -1;
+        wakeup_task_wdog_id = sys_watchdog_register(false);
+        ASSERT_WARNING(wakeup_task_wdog_id != -1);
+#endif
 
         uart3_h = ad_uart_open(&uart3_uart_conf);                               /* Open the UART with the desired configuration    */
         ASSERT_ERROR(uart3_h != NULL);                                          /* Check if the UART1 opened OK */
 
         do {
+
+                /* Suspend watchdog while blocking on reading the queue */
+                sys_watchdog_suspend(wakeup_task_wdog_id);
+
                 bytes = ad_uart_read(uart3_h, &c, 1, OS_EVENT_FOREVER);         /* Wait for one char synchronously                 */
+
+                /* Trigger the watchdog notification */
+                sys_watchdog_notify_and_resume(wakeup_task_wdog_id);
+
                 if (bytes > 0) {                                                /* if there is a successful read...                */
                         ad_uart_write(uart3_h, &c, bytes);                      /*       then write back the char to UART (echo)   */
                 }
+
         } while( c != 27 );                                                     /* Exit the task if received ESC character (ASCII=27) */
 
         while (ad_uart_close(uart3_h, false) == AD_UART_ERROR_CONTROLLER_BUSY); /* Wait until the UART has finished all the transactions
                                                                                  * before exiting. */
 
+#if dg_configUSE_WDOG
+        sys_watchdog_unregister(wakeup_task_wdog_id);                   /* Unregister from watchdog before deleting the task */
+        wakeup_task_wdog_id = -1;
+#endif
+
         OS_TASK_DELETE( OS_GET_CURRENT_TASK() );                        /* Delete the task before exiting. It is not allowed in
                                                                          * FreeRTOS a task to exit without being deleted from
                                                                          * the OS's queues */
+        OS_TASK_END();
 }
 
 /**
@@ -391,18 +479,6 @@ static void periph_init(void)
          * The UART configuration is in the platform_devices.c and the necessary declarations
          * of the three UART configuration instances are in the platform_devices.h
          */
-        hw_gpio_reserve_and_configure_pin(CURSOR_PORT, CURSOR_RX, HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, false);
-        hw_gpio_pad_latch_enable(CURSOR_PORT, CURSOR_RX);
-        hw_gpio_reserve_and_configure_pin(CURSOR_PORT, CURSOR_TX, HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, false);
-        hw_gpio_pad_latch_enable(CURSOR_PORT, CURSOR_TX);
-
-        hw_gpio_reserve_and_configure_pin(CURSOR_PORT, CURSOR_RX_INT, HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, false);
-        hw_gpio_pad_latch_enable(CURSOR_PORT, CURSOR_RX_INT);
-        hw_gpio_reserve_and_configure_pin(CURSOR_PORT, CURSOR_TX_INT, HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, false);
-        hw_gpio_pad_latch_enable(CURSOR_PORT, CURSOR_TX_INT);
-
-        hw_gpio_reserve_and_configure_pin(CURSOR_PORT, CURSOR_ISSUE, HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, false);
-        hw_gpio_pad_latch_enable(CURSOR_PORT, CURSOR_ISSUE);
 }
 
 /**
@@ -417,7 +493,7 @@ static void prvSetupHardware( void )
 /**
  * @brief Malloc fail hook
  */
-void vApplicationMallocFailedHook( void )
+OS_APP_MALLOC_FAILED(void)
 {
         /* vApplicationMallocFailedHook() will only be called if
         configUSE_MALLOC_FAILED_HOOK is set to 1 in FreeRTOSConfig.h.  It is a hook
@@ -435,7 +511,7 @@ void vApplicationMallocFailedHook( void )
 /**
  * @brief Application idle task hook
  */
-void vApplicationIdleHook( void )
+OS_APP_IDLE(void)
 {
         /* vApplicationIdleHook() will only be called if configUSE_IDLE_HOOK is set
            to 1 in FreeRTOSConfig.h.  It will be called on each iteration of the idle
@@ -476,7 +552,7 @@ void vApplicationIdleHook( void )
 /**
  * @brief Application stack overflow hook
  */
-void vApplicationStackOverflowHook( OS_TASK pxTask, char *pcTaskName )
+OS_APP_STACK_OVERFLOW(OS_TASK pxTask, char *pcTaskName)
 {
         ( void ) pcTaskName;
         ( void ) pxTask;
@@ -490,7 +566,7 @@ void vApplicationStackOverflowHook( OS_TASK pxTask, char *pcTaskName )
 /**
  * @brief Application tick hook
  */
-void vApplicationTickHook( void )
+OS_APP_TICK(void)
 {
 }
 
