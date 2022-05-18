@@ -5,7 +5,7 @@
  *
  * @brief Configuration of devices connected to board
  *
- * Copyright (C) 2016-2019 Dialog Semiconductor.
+ * Copyright (C) 2015-2022 Dialog Semiconductor.
  * This computer program includes Confidential, Proprietary Information
  * of Dialog Semiconductor. All Rights Reserved.
  *
@@ -21,6 +21,7 @@ extern "C" {
 #if (dg_configUART_ADAPTER == 1)
 
 #include "ad_uart.h"
+#include "peripheral_setup.h"
 
 /**************************** UART1 configuration start ****************************/
 
@@ -28,8 +29,8 @@ const ad_uart_io_conf_t uart1_io_conf = {
         /* UART RX pin configuration */
         .rx = {
                 /* RX pin configuration selection */
-                .port = HW_GPIO_PORT_1,
-                .pin = HW_GPIO_PIN_8,
+                .port = UART1_RX_PORT,
+                .pin = UART1_RX_PIN,
                 /* RX pin configuration when device is active ('On') */
                 {
                         .mode = HW_GPIO_MODE_INPUT_PULLUP,
@@ -47,8 +48,8 @@ const ad_uart_io_conf_t uart1_io_conf = {
         /* UART TX pin configuration */
         .tx = {
                 /* TX pin configuration selection */
-                .port = HW_GPIO_PORT_1,
-                .pin = HW_GPIO_PIN_9,
+                .port = UART1_TX_PORT,
+                .pin = UART1_TX_PIN,
                 /* TX pin configuration when device is active ('On') */
                 {
                         .mode = HW_GPIO_MODE_OUTPUT,
@@ -105,8 +106,8 @@ const ad_uart_io_conf_t uart2_io_conf = {
         /* UART RX pin configuration */
         .rx = {
                 /* RX pin configuration selection */
-                .port = HW_GPIO_PORT_2,
-                .pin = HW_GPIO_PIN_1,
+                .port = UART2_RX_PORT,
+                .pin = UART2_RX_PIN,
                 /* RX pin configuration when device is active ('On') */
                 {
                         .mode = HW_GPIO_MODE_INPUT_PULLUP,
@@ -123,8 +124,8 @@ const ad_uart_io_conf_t uart2_io_conf = {
         /* UART TX pin configuration */
         .tx = {
                 /* TX pin configuration selection */
-                .port = HW_GPIO_PORT_0,
-                .pin = HW_GPIO_PIN_8,
+                .port = UART2_TX_PORT,
+                .pin = UART2_TX_PIN,
                 /* TX pin configuration when device is active ('On') */
                 {
                         .mode = HW_GPIO_MODE_OUTPUT,
@@ -143,8 +144,8 @@ const ad_uart_io_conf_t uart2_io_conf = {
          * do not include it in case CTS/RTS is not used to save some GPIOS
          * for other purpose */
         .rtsn = {
-                .port = HW_GPIO_PORT_0,
-                .pin = HW_GPIO_PIN_29,
+                .port = UART2_RTS_PORT,
+                .pin = UART2_RTS_PIN,
                 /* RSTN pin configuration when device is active ('On') */
                 {
                         .mode = HW_GPIO_MODE_OUTPUT,
@@ -163,8 +164,8 @@ const ad_uart_io_conf_t uart2_io_conf = {
          * do not include it in case CTS/RTS is not used to save some GPIOS
          * for other purpose */
         .ctsn = {
-                .port = HW_GPIO_PORT_0,
-                .pin = HW_GPIO_PIN_11,
+                .port = UART2_CTS_PORT,
+                .pin = UART2_CTS_PIN,
                 /* CSTN pin configuration when device is active ('On') */
                 {
                         .mode = HW_GPIO_MODE_INPUT_PULLUP,
@@ -218,8 +219,8 @@ const ad_uart_controller_conf_t uart2_uart_conf = {
 const ad_uart_io_conf_t uart3_io_conf = {
         /* UART RX pin configuration */
         .rx = {
-                .port = HW_GPIO_PORT_0,
-                .pin = HW_GPIO_PIN_26,
+                .port = UART3_RX_PORT,
+                .pin = UART3_RX_PIN,
                 /* RX pin configuration when device is active ('On') */
                 {
                         .mode = HW_GPIO_MODE_INPUT_PULLUP,
@@ -235,8 +236,8 @@ const ad_uart_io_conf_t uart3_io_conf = {
         },
         /* UART TX pin configuration */
         .tx = {
-                .port = HW_GPIO_PORT_0,
-                .pin = HW_GPIO_PIN_27,
+                .port = UART3_TX_PORT,
+                .pin = UART3_TX_PIN,
                 /* TX pin configuration when device is active ('On') */
                 {
                         .mode = HW_GPIO_MODE_OUTPUT,
@@ -255,8 +256,8 @@ const ad_uart_io_conf_t uart3_io_conf = {
          * do not include it in case CTS/RTS is not used to save some GPIOS
          * for other purpose */
         .rtsn = {
-                .port = HW_GPIO_PORT_0,
-                .pin = HW_GPIO_PIN_28,
+                .port = UART3_RTS_PORT,
+                .pin = UART3_RTS_PIN,
                 /* RSTN pin configuration when device is active ('On') */
                 {
                         .mode = HW_GPIO_MODE_OUTPUT,
@@ -275,8 +276,8 @@ const ad_uart_io_conf_t uart3_io_conf = {
          * do not include it in case CTS/RTS is not used to save some GPIOS
          * for other purpose */
         .ctsn = {
-                .port = HW_GPIO_PORT_1,
-                .pin = HW_GPIO_PIN_29,
+                .port = UART3_CTS_PORT,
+                .pin = UART3_CTS_PIN,
                 /* CSTN pin configuration when device is active ('On') */
                 {
                         .mode = HW_GPIO_MODE_INPUT_PULLUP,

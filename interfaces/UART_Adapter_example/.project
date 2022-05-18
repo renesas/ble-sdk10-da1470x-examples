@@ -98,7 +98,7 @@
 	<variableList>
 		<variable>
 			<name>SDKROOT</name>
-			<value>file:/C:/Users/mtzanida/Documents/Documentation/1470x_related/Cobalt_SDK/lpc_cs_da1470x_sdk_10</value>
+			<value>$%7BWORKSPACE_LOC%7D</value>
 		</variable>
 	</variableList>
 </projectDescription>

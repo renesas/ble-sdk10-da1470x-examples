@@ -5,7 +5,7 @@
  *
  * @brief Configuration of devices connected to board
  *
- * Copyright (C) 2016-2019 Dialog Semiconductor.
+ * Copyright (C) 2015-2022 Dialog Semiconductor.
  * This computer program includes Confidential, Proprietary Information
  * of Dialog Semiconductor. All Rights Reserved.
  *
@@ -20,17 +20,6 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#if (dg_configGPADC_ADAPTER == 1)
-
-
-/*
- * Define sources connected to GPADC
- */
-
-const ad_gpadc_controller_conf_t BATTERY_LEVEL;
-#endif
-
 
 #endif /* dg_configGPADC_ADAPTER */
 
