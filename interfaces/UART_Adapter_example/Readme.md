@@ -5,7 +5,7 @@
 This application demonstrates the use of all three UARTs through the Adapters abstraction layer.
 The name of the project is **UART_Adapter_example**.
 
-For **UART1** the echo-back is implemented without flow control since UART1 does not support RTS/CTS functionality. The echo implementation is using blocking calls of the UART adater API via a single task. The task initiates a UART read for a single character which is transmitted back once received.
+For **UART1** the echo-back is implemented without flow control since UART1 does not support RTS/CTS functionality. The echo implementation is using blocking calls of the UART adapter API via a single task. The task initiates a UART read for a single character which is transmitted back once received.
 
 For **UART2** the echo-back is using HW flow control with RTS/CTS. The implementation of the echo-back is using two tasks, one receiving a character from PC and one transmitting a character to the UART. The implementation for the UART2 uses an OS Queue for passing the received characters to TX task.
 
