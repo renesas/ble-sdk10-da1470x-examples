@@ -729,7 +729,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
 
 #if (DLG_LVGL_CF == 1)
     // Check if there is an image that must be handled by the GPU
-    if (!lv_img_cf_use_sw(cf) | lv_area_get_size(draw_area) > DLG_LVGL_GPU_BLIT_MASK_SIZE_LIMIT) {
+    if (!lv_img_cf_use_sw(cf) || (lv_area_get_size(draw_area) > DLG_LVGL_GPU_BLIT_MASK_SIZE_LIMIT)) {
         if(disp->driver->gpu_blit_with_mask_cb && disp->driver->gpu_config_blit_cb) {
             lv_draw_img_dsc_t dsc;
             lv_draw_img_dsc_init(&dsc);
@@ -766,11 +766,6 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
 
             for(y = 0; y < draw_area_h; y++) {
                 const lv_opa_t * mask_tmp_x = mask;
-#if 0
-                for(x = 0; x < draw_area_w; x++) {
-                    MAP_NORMAL_MASK_PX(x);
-                }
-#else
                 for(x = 0; x < draw_area_w && ((lv_uintptr_t)mask_tmp_x & 0x3); x++) {
 #if LV_COLOR_SCREEN_TRANSP
                     MAP_NORMAL_MASK_PX_SCR_TRANSP(x)
@@ -814,7 +809,6 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
                     MAP_NORMAL_MASK_PX(x)
 #endif
                 }
-#endif
                 disp_buf_first += disp_w;
                 mask += draw_area_w;
                 map_buf_first += map_w;

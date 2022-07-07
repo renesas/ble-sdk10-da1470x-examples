@@ -5,9 +5,24 @@
  *
  * @brief Performance Metrics module
  *
- * Copyright (C) 2021-2022 Dialog Semiconductor.
- * This computer program includes Confidential, Proprietary Information
- * of Dialog Semiconductor. All Rights Reserved.
+ * Copyright (c) 2022 Dialog Semiconductor. All rights reserved.
+ *
+ * This software ("Software") is owned by Dialog Semiconductor. By using this Software
+ * you agree that Dialog Semiconductor retains all intellectual property and proprietary
+ * rights in and to this Software and any use, reproduction, disclosure or distribution
+ * of the Software without express written permission or a license agreement from Dialog
+ * Semiconductor is strictly prohibited. This Software is solely for use on or in
+ * conjunction with Dialog Semiconductor products.
+ *
+ * EXCEPT AS OTHERWISE PROVIDED IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR AS
+ * REQUIRED BY LAW, THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. EXCEPT AS OTHERWISE PROVIDED
+ * IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR BY LAW, IN NO EVENT SHALL DIALOG
+ * SEMICONDUCTOR BE LIABLE FOR ANY DIRECT, SPECIAL, INDIRECT, INCIDENTAL, OR
+ * CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE SOFTWARE.
  *
  ****************************************************************************************
  */
@@ -17,7 +32,7 @@
 
 #define METRICS_MAX               (1000)
 #define METRICS_TAG_MAX           (10)
-#define MAX_OS_TASK_NUM           (8)
+#define MAX_OS_TASK_NUM           (10)
 #define GUI_THREAD_NAME           ("GUI thread")
 
 static struct {
@@ -37,7 +52,7 @@ static void get_GUI_thread_CPU_time(uint32_t *task_time, uint32_t *runtime)
         uint8_t i;
         uint8_t os_task_count;
 
-        os_task_count = uxTaskGetSystemState(task_status_array, uxTaskGetNumberOfTasks(), runtime);
+        os_task_count = uxTaskGetSystemState(task_status_array, ARRAY_LENGTH(task_status_array), runtime);
         for (i = 0; i < os_task_count; i++) {
                 if (strcmp(task_status_array[i].pcTaskName, GUI_THREAD_NAME) == 0) {
                         *task_time = task_status_array[i].ulRunTimeCounter;

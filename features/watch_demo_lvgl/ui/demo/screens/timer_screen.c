@@ -5,13 +5,27 @@
  *
  * @brief Timer screen source file
  *
- * Copyright (C) 2021-2022 Dialog Semiconductor.
- * This computer program includes Confidential, Proprietary Information
- * of Dialog Semiconductor. All Rights Reserved.
+ * Copyright (c) 2022 Dialog Semiconductor. All rights reserved.
+ *
+ * This software ("Software") is owned by Dialog Semiconductor. By using this Software
+ * you agree that Dialog Semiconductor retains all intellectual property and proprietary
+ * rights in and to this Software and any use, reproduction, disclosure or distribution
+ * of the Software without express written permission or a license agreement from Dialog
+ * Semiconductor is strictly prohibited. This Software is solely for use on or in
+ * conjunction with Dialog Semiconductor products.
+ *
+ * EXCEPT AS OTHERWISE PROVIDED IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR AS
+ * REQUIRED BY LAW, THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. EXCEPT AS OTHERWISE PROVIDED
+ * IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR BY LAW, IN NO EVENT SHALL DIALOG
+ * SEMICONDUCTOR BE LIABLE FOR ANY DIRECT, SPECIAL, INDIRECT, INCIDENTAL, OR
+ * CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE SOFTWARE.
  *
  ****************************************************************************************
  */
-
 /*
  *      INCLUDES
  *****************************************************************************************
@@ -35,7 +49,7 @@ static void reset_timer_cb(lv_event_t *e);
  */
 static lv_obj_t *stopwatch_label, *prev_active;
 static lv_timer_t *counter_timer;
-static uint32_t start_time;
+static uint32_t start_time, total_elapsed_time;
 
 /*
  *      MACROS
@@ -63,7 +77,9 @@ void show_timer_cb(lv_event_t *e)
  */
 static void show_timer_screen()
 {
-        lv_obj_t *timer_screen_obj, *show_timer_obj, *timer_label, *reset_obj;
+        lv_obj_t *timer_area_obj, *timer_screen_obj, *show_timer_obj, *timer_label, *reset_area_obj, *reset_obj;
+        lv_coord_t clickable_w = 100;
+        lv_coord_t clickable_h = 100;
 
         /* save previously active screen */
         prev_active = lv_scr_act();
@@ -82,24 +98,32 @@ static void show_timer_screen()
         counter_timer = lv_timer_create(update_timer_cb, LV_DISP_DEF_REFR_PERIOD, NULL);
         lv_timer_pause(counter_timer);
 
-        show_timer_obj = lv_img_create(timer_screen_obj);
+        timer_area_obj = lv_obj_create(timer_screen_obj);
+        lv_obj_remove_style_all(timer_area_obj);
+        lv_obj_set_size(timer_area_obj, clickable_w, clickable_h);
+        lv_obj_set_pos(timer_area_obj, (DEMO_RESX - clickable_w) / 2, 100);
+        lv_obj_add_event_cb(timer_area_obj, click_timer_cb, LV_EVENT_CLICKED, NULL);
+        lv_obj_add_flag(timer_area_obj, LV_OBJ_FLAG_CLICKABLE);
+
+        show_timer_obj = lv_img_create(timer_area_obj);
         lv_img_set_src(show_timer_obj, &timer);
-        lv_obj_set_pos(show_timer_obj, (DEMO_RESX - timer.header.w) / 2, 126);
-        lv_obj_add_event_cb(show_timer_obj, click_timer_cb, LV_EVENT_CLICKED, NULL);
-        lv_obj_add_flag(show_timer_obj, LV_OBJ_FLAG_CLICKABLE);
+        lv_obj_align(show_timer_obj, LV_ALIGN_CENTER, 0, 0);
 
         stopwatch_label = lv_label_create(timer_screen_obj);
         lv_label_set_recolor(stopwatch_label, true);
         lv_obj_set_style_text_font(stopwatch_label, &lv_font_montserrat_32, 0);
-        update_timer(0);
+        update_timer(total_elapsed_time);
 
-        reset_obj = lv_img_create(timer_screen_obj);
+        reset_area_obj = lv_obj_create(timer_screen_obj);
+        lv_obj_remove_style_all(reset_area_obj);
+        lv_obj_set_size(reset_area_obj, clickable_w, clickable_w);
+        lv_obj_set_pos(reset_area_obj, (DEMO_RESX - clickable_w) / 2, 276);
+        lv_obj_add_event_cb(reset_area_obj, reset_timer_cb, LV_EVENT_CLICKED, timer_area_obj);
+        lv_obj_add_flag(reset_area_obj, LV_OBJ_FLAG_CLICKABLE);
+
+        reset_obj = lv_img_create(reset_area_obj);
         lv_img_set_src(reset_obj, &reset_timer);
-        lv_obj_set_pos(reset_obj, (DEMO_RESX - reset_timer.header.w) / 2, 302);
-        lv_obj_add_event_cb(reset_obj, reset_timer_cb, LV_EVENT_CLICKED, NULL);
-        lv_obj_add_flag(reset_obj, LV_OBJ_FLAG_CLICKABLE);
-
-        start_time = lv_tick_get();
+        lv_obj_align(reset_obj, LV_ALIGN_CENTER, 0, 0);
 
         lv_scr_load(timer_screen_obj);
 }
@@ -115,12 +139,13 @@ static void gesture_event_cb(lv_event_t *e)
                 }
                 lv_scr_load(prev_active);
                 lv_obj_del(screen_obj);
+                lv_timer_del(counter_timer);
         }
 }
 
 static void update_timer_cb()
 {
-        update_timer(lv_tick_elaps(start_time));
+        update_timer(lv_tick_elaps(start_time) + total_elapsed_time);
 }
 
 static void update_timer(uint32_t elapsedTime)
@@ -146,10 +171,12 @@ static void click_timer_cb(lv_event_t *e)
         if (code == LV_EVENT_CLICKED) {
                 if (lv_obj_has_state(obj, LV_STATE_CHECKED)) {
                         lv_obj_clear_state(obj, LV_STATE_CHECKED);
+                        total_elapsed_time = total_elapsed_time + lv_tick_get() - start_time;
                         lv_timer_pause(counter_timer);
                 }
                 else {
                         lv_obj_add_state(obj, LV_STATE_CHECKED);
+                        start_time = lv_tick_get();
                         lv_timer_resume(counter_timer);
                 }
         }
@@ -158,12 +185,14 @@ static void click_timer_cb(lv_event_t *e)
 static void reset_timer_cb(lv_event_t *e)
 {
         lv_event_code_t code = lv_event_get_code(e);
+        lv_obj_t *timer_area_obj = (lv_obj_t *)lv_event_get_user_data(e);
+
         if (code == LV_EVENT_CLICKED) {
                 if (!counter_timer->paused) {
+                        lv_obj_clear_state(timer_area_obj, LV_STATE_CHECKED);
                         lv_timer_pause(counter_timer);
                 }
-                start_time = lv_tick_get();
-
-                update_timer(0);
+                total_elapsed_time = 0;
+                update_timer(total_elapsed_time);
         }
 }

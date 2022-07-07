@@ -5,9 +5,24 @@
  *
  * @brief LCD configuration for LS013B7DH03 LCD
  *
- * Copyright (C) 2020-2022 Dialog Semiconductor.
- * This computer program includes Confidential, Proprietary Information
- * of Dialog Semiconductor. All Rights Reserved.
+ * Copyright (c) 2022 Dialog Semiconductor. All rights reserved.
+ *
+ * This software ("Software") is owned by Dialog Semiconductor. By using this Software
+ * you agree that Dialog Semiconductor retains all intellectual property and proprietary
+ * rights in and to this Software and any use, reproduction, disclosure or distribution
+ * of the Software without express written permission or a license agreement from Dialog
+ * Semiconductor is strictly prohibited. This Software is solely for use on or in
+ * conjunction with Dialog Semiconductor products.
+ *
+ * EXCEPT AS OTHERWISE PROVIDED IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR AS
+ * REQUIRED BY LAW, THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. EXCEPT AS OTHERWISE PROVIDED
+ * IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR BY LAW, IN NO EVENT SHALL DIALOG
+ * SEMICONDUCTOR BE LIABLE FOR ANY DIRECT, SPECIAL, INDIRECT, INCIDENTAL, OR
+ * CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE SOFTWARE.
  *
  ****************************************************************************************
  */
@@ -47,7 +62,7 @@
 
  * const ad_lcdc_io_conf_t ls013b7dh03_io = {
  *       .voltage_level = HW_GPIO_POWER_V33,
- *       .io_cnt = sizeof(ls013b7dh03_gpio_cfg) / sizeof(ls013b7dh03_gpio_cfg[0]),
+ *       .io_cnt = ARRAY_LENGTH(ls013b7dh03_gpio_cfg),
  *       .io_list = ls013b7dh03_gpio_cfg,
  * };
  */
@@ -59,8 +74,8 @@ static GDI_DRV_CONF_ATTR ad_lcdc_driver_conf_t ls013b7dh03_drv = {
         .hw_init.resy = GDI_DISP_RESY,
         .hw_init.cfg_extra_flags = 0,
         .hw_init.mode = HW_LCDC_MODE_DISABLE,
-        .hw_init.write_freq = LCDC_FREQ_1MHz,
-        .ext_clk = HW_LCDC_EXT_CLK_62_5HZ,
+        .hw_init.write_freq = LCDC_FREQ_1MHz,   //Max @ 1.1MHz
+        .ext_clk = HW_LCDC_EXT_CLK_62_5HZ,      //Max @ 65Hz
         .te_enable = false,
         .te_mode = HW_LCDC_TE_POL_LOW,
 };

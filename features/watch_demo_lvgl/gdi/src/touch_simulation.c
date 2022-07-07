@@ -5,9 +5,24 @@
  *
  * @brief Touch Simulation for GDI
  *
- * Copyright (C) 2021-2022 Dialog Semiconductor.
- * This computer program includes Confidential, Proprietary Information
- * of Dialog Semiconductor. All Rights Reserved.
+ * Copyright (c) 2022 Dialog Semiconductor. All rights reserved.
+ *
+ * This software ("Software") is owned by Dialog Semiconductor. By using this Software
+ * you agree that Dialog Semiconductor retains all intellectual property and proprietary
+ * rights in and to this Software and any use, reproduction, disclosure or distribution
+ * of the Software without express written permission or a license agreement from Dialog
+ * Semiconductor is strictly prohibited. This Software is solely for use on or in
+ * conjunction with Dialog Semiconductor products.
+ *
+ * EXCEPT AS OTHERWISE PROVIDED IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR AS
+ * REQUIRED BY LAW, THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. EXCEPT AS OTHERWISE PROVIDED
+ * IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR BY LAW, IN NO EVENT SHALL DIALOG
+ * SEMICONDUCTOR BE LIABLE FOR ANY DIRECT, SPECIAL, INDIRECT, INCIDENTAL, OR
+ * CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE SOFTWARE.
  *
  ****************************************************************************************
  */
@@ -63,16 +78,19 @@ static const gdi_touch_data_t slide_left_to_right[] = {
 };
 
 static const gdi_touch_data_t slide_right_to_left[] = {
-        { 12, 200, 1 },
-        { 65, 200, 1 },
-        { 120, 200, 1 },
-        { 170, 200, 1 },
-        { 227, 200, 1 },
-        { 283, 200, 1 },
-        { 324, 200, 1 },
-        { 346, 200, 1 },
-        { 350, 200, 1 },
-        { 350, 200, 0 },
+        { 5, 200, 1 },
+        { 28, 200, 1 },
+        { 70, 200, 1 },
+        { 110, 200, 1 },
+        { 151, 200, 1 },
+        { 191, 200, 1 },
+        { 233, 200, 1 },
+        { 278, 200, 1 },
+        { 318, 200, 1 },
+        { 359, 200, 1 },
+        { 381, 200, 1 },
+        { 385, 200, 1 },
+        { 385, 200, 0 },
 };
 
 static const gdi_touch_data_t slide_menu_down[] = {

@@ -1,21 +1,28 @@
 /**
- * \addtogroup UI
- * \{
- * \addtogroup GDI
- *
- * \brief GDI configuration
- * \{
- */
-/**
  ****************************************************************************************
  *
  * @file gdi_config.h
  *
  * @brief Configures GDI parameters
  *
- * Copyright (C) 2020-2022 Dialog Semiconductor.
- * This computer program includes Confidential, Proprietary Information
- * of Dialog Semiconductor. All Rights Reserved.
+ * Copyright (c) 2022 Dialog Semiconductor. All rights reserved.
+ *
+ * This software ("Software") is owned by Dialog Semiconductor. By using this Software
+ * you agree that Dialog Semiconductor retains all intellectual property and proprietary
+ * rights in and to this Software and any use, reproduction, disclosure or distribution
+ * of the Software without express written permission or a license agreement from Dialog
+ * Semiconductor is strictly prohibited. This Software is solely for use on or in
+ * conjunction with Dialog Semiconductor products.
+ *
+ * EXCEPT AS OTHERWISE PROVIDED IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR AS
+ * REQUIRED BY LAW, THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. EXCEPT AS OTHERWISE PROVIDED
+ * IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR BY LAW, IN NO EVENT SHALL DIALOG
+ * SEMICONDUCTOR BE LIABLE FOR ANY DIRECT, SPECIAL, INDIRECT, INCIDENTAL, OR
+ * CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE SOFTWARE.
  *
  ****************************************************************************************
  */
@@ -25,13 +32,7 @@
 
 #include "demo.h"
 
-#if dg_configUSE_HM80160A090
-#include "hm80160a090.h"
-#elif dg_configUSE_E1394AA65A
-#include "e1394aa65a.h"
-#elif dg_configUSE_E1394AA65A_DSPI
-#include "e1394aa65a_dspi.h"
-#elif dg_configUSE_LPM012M134B
+#if   dg_configUSE_LPM012M134B
 #include "lpm012m134b.h"
 #elif dg_configUSE_NHD43480272EFASXN
 #include "nhd43480272efasxn.h"
@@ -53,18 +54,6 @@
 #include "lpm013m091a.h"
 #elif dg_configUSE_ILI9341
 #include "ili9341.h"
-#elif dg_configUSE_RM69310
-#include "rm69310.h"
-#elif dg_configUSE_XSJ120TY2401_QSPI
-#include "xsj120ty2401_qspi.h"
-#elif dg_configUSE_XSJ120TY2401_SPI3
-#include "xsj120ty2401_spi3.h"
-#elif dg_configUSE_XSJ120TY2401_SPI4
-#include "xsj120ty2401_spi4.h"
-#elif dg_configUSE_XSJ120TY2401_DSPI
-#include "xsj120ty2401_dspi.h"
-#elif dg_configUSE_XSJ120TY2401_DBIB
-#include "xsj120ty2401_dbib.h"
 #elif dg_configUSE_MRB3973_DBIB
 #include "mrb3973_dbib.h"
 #elif dg_configUSE_BOE139F454SM

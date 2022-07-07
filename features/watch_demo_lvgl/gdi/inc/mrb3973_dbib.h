@@ -5,9 +5,24 @@
  *
  * @brief LCD configuration for MRB3973 with IC NT35510
  *
- * Copyright (C) 2020-2022 Dialog Semiconductor.
- * This computer program includes Confidential, Proprietary Information
- * of Dialog Semiconductor. All Rights Reserved.
+ * Copyright (c) 2022 Dialog Semiconductor. All rights reserved.
+ *
+ * This software ("Software") is owned by Dialog Semiconductor. By using this Software
+ * you agree that Dialog Semiconductor retains all intellectual property and proprietary
+ * rights in and to this Software and any use, reproduction, disclosure or distribution
+ * of the Software without express written permission or a license agreement from Dialog
+ * Semiconductor is strictly prohibited. This Software is solely for use on or in
+ * conjunction with Dialog Semiconductor products.
+ *
+ * EXCEPT AS OTHERWISE PROVIDED IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR AS
+ * REQUIRED BY LAW, THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. EXCEPT AS OTHERWISE PROVIDED
+ * IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR BY LAW, IN NO EVENT SHALL DIALOG
+ * SEMICONDUCTOR BE LIABLE FOR ANY DIRECT, SPECIAL, INDIRECT, INCIDENTAL, OR
+ * CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE SOFTWARE.
  *
  ****************************************************************************************
  */
@@ -97,9 +112,6 @@ static GDI_DRV_CONF_ATTR ad_lcdc_driver_conf_t mrb3973_dbib_drv = {
         .hw_init.dither = HW_LCDC_DITHER_OFF,
         .hw_init.iface_conf.dbib.write_memory_cmd = mrb3973_dbib_write_memory_cmd,
         .hw_init.iface_conf.dbib.write_memory_cmd_len = sizeof(mrb3973_dbib_write_memory_cmd),
-#if (DEVICE_REVISION == DEVICE_REV_A)
-        .palette_lut = NULL,
-#endif
         .set_position_cb = mrb3973_dbib_mipi_set_position,
         .ext_clk = HW_LCDC_EXT_CLK_OFF,
         .te_enable = false,

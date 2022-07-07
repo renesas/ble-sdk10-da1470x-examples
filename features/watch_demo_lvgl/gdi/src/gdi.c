@@ -1,19 +1,28 @@
 /**
- * \addtogroup UI
- * \{
- * \addtogroup GDI
- * \{
- */
-/**
  ****************************************************************************************
  *
  * @file gdi.c
  *
  * @brief Basic graphic functions implementation
  *
- * Copyright (C) 2020-2022 Dialog Semiconductor.
- * This computer program includes Confidential, Proprietary Information
- * of Dialog Semiconductor. All Rights Reserved.
+ * Copyright (c) 2022 Dialog Semiconductor. All rights reserved.
+ *
+ * This software ("Software") is owned by Dialog Semiconductor. By using this Software
+ * you agree that Dialog Semiconductor retains all intellectual property and proprietary
+ * rights in and to this Software and any use, reproduction, disclosure or distribution
+ * of the Software without express written permission or a license agreement from Dialog
+ * Semiconductor is strictly prohibited. This Software is solely for use on or in
+ * conjunction with Dialog Semiconductor products.
+ *
+ * EXCEPT AS OTHERWISE PROVIDED IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR AS
+ * REQUIRED BY LAW, THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. EXCEPT AS OTHERWISE PROVIDED
+ * IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR BY LAW, IN NO EVENT SHALL DIALOG
+ * SEMICONDUCTOR BE LIABLE FOR ANY DIRECT, SPECIAL, INDIRECT, INCIDENTAL, OR
+ * CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE SOFTWARE.
  *
  ****************************************************************************************
  */
@@ -94,15 +103,7 @@
 #endif
 
 #ifndef GDI_LCDC_FIFO_PREFETCH_LVL
-#if (DEVICE_FAMILY == DA1469X)
-#define GDI_LCDC_FIFO_PREFETCH_LVL              (HW_LCDC_FIFO_PREFETCH_LVL_4)
-#elif (DEVICE_FAMILY == DA1470X)
-#if (DEVICE_REVISION == DEVICE_REV_A)
 #define GDI_LCDC_FIFO_PREFETCH_LVL              (HW_LCDC_FIFO_PREFETCH_LVL_3)
-#elif (DEVICE_REVISION == DEVICE_REV_B)
-#define GDI_LCDC_FIFO_PREFETCH_LVL              (HW_LCDC_FIFO_PREFETCH_LVL_ENABLED)
-#endif
-#endif
 #endif
 
 #ifndef GDI_USE_OS_TIMER
@@ -205,10 +206,6 @@ static int pixel_count;
 static int render_count;
 #endif
 
-#if (DEVICE_FAMILY == DA1469X)
-static bool gdi_verify_update_region(hw_lcdc_frame_t *frame, HW_LCDC_LAYER_COLOR_MODE color,
-        HW_LCDC_FIFO_PREFETCH_LVL lvl);
-#endif
 
 #if GDI_PWMLED_BACKLIGHT
 __STATIC_INLINE void hw_led_set_led1_load(uint8_t level)
@@ -305,17 +302,10 @@ static void console_log(void)
         }
 
 #if !defined(PERFORMANCE_METRICS)
-#if 0
-        printf("FPS: %3d.%d (frame: %3d.%.2d ms, transfer: %3d.%.2d ms)\r\n", fps / 10, fps % 10, (frame_duration_us / 1000),
-                                                                                           (frame_duration_us / 10) % 100,
-                                                                                           (transfer_duration_us / 1000),
-                                                                                           (transfer_duration_us / 10) % 100);
-#else
         printf("%3d.%d\t%3d.%.2d\t%3d.%.2d\r\n", fps / 10, fps % 10, (frame_duration_us / 1000),
                                                                                            (frame_duration_us / 10) % 100,
                                                                                            (transfer_duration_us / 1000),
                                                                                            (transfer_duration_us / 10) % 100);
-#endif
 #endif /* !defined(PERFORMANCE_METRICS) */
 #endif
 }
@@ -505,7 +495,9 @@ static void dev_open_touch(void)
 
 static void dev_close_touch(void)
 {
+#if (GDI_TOUCH_INTERFACE != GDI_TOUCH_INTERFACE_OTHER)
         OS_TICK_TIME timeout = OS_GET_TICK_COUNT() + OS_MS_2_TICKS(DEV_CLOSE_TIMEOUT_MS);
+#endif
 
 #if (GDI_TOUCH_INTERFACE == GDI_TOUCH_INTERFACE_I2C)
         while (ad_i2c_close(gdi->touch_h, false) != AD_I2C_ERROR_NONE) {
@@ -742,19 +734,12 @@ static void dev_set_partial_update(void)
 HW_LCDC_LAYER_COLOR_MODE gdi_to_layer_color_format(gdi_color_fmt_t format)
 {
         switch (format) {
-#if (DEVICE_FAMILY == DA1469X)
-        case GDI_FORMAT_L1:       return HW_LCDC_LCM_L1;
-        case GDI_FORMAT_L4:       return HW_LCDC_LCM_L4;
-        case GDI_FORMAT_L8:       return HW_LCDC_LCM_L8;
-#endif
         case GDI_FORMAT_RGB332:   return HW_LCDC_LCM_RGB332;
         case GDI_FORMAT_RGB565:   return HW_LCDC_LCM_RGB565;
         case GDI_FORMAT_RGBA5551: return HW_LCDC_LCM_RGBA5551;
-#if (DEVICE_FAMILY == DA1470X)
         case GDI_FORMAT_RGB888:   return HW_LCDC_LCM_RGB888;
         case GDI_FORMAT_RGBA4444: return HW_LCDC_LCM_RGBA4444;
         case GDI_FORMAT_ARGB4444: return HW_LCDC_LCM_ARGB4444;
-#endif
         case GDI_FORMAT_ARGB8888: return HW_LCDC_LCM_ARGB8888;
         case GDI_FORMAT_RGBA8888: return HW_LCDC_LCM_RGBA8888;
         case GDI_FORMAT_ABGR8888: return HW_LCDC_LCM_ABGR8888;
@@ -768,19 +753,12 @@ HW_LCDC_LAYER_COLOR_MODE gdi_to_layer_color_format(gdi_color_fmt_t format)
 gdi_color_fmt_t gdi_from_layer_color_format(HW_LCDC_LAYER_COLOR_MODE format)
 {
         switch (format) {
-#if (DEVICE_FAMILY == DA1469X)
-        case HW_LCDC_LCM_L1:       return GDI_FORMAT_L1;
-        case HW_LCDC_LCM_L4:       return GDI_FORMAT_L4;
-        case HW_LCDC_LCM_L8:       return GDI_FORMAT_L8;
-#endif
         case HW_LCDC_LCM_RGB332:   return GDI_FORMAT_RGB332;
         case HW_LCDC_LCM_RGB565:   return GDI_FORMAT_RGB565;
         case HW_LCDC_LCM_RGBA5551: return GDI_FORMAT_RGBA5551;
-#if (DEVICE_FAMILY == DA1470X)
         case HW_LCDC_LCM_RGB888:   return GDI_FORMAT_RGB888;
         case HW_LCDC_LCM_RGBA4444: return GDI_FORMAT_RGBA4444;
         case HW_LCDC_LCM_ARGB4444: return GDI_FORMAT_ARGB4444;
-#endif
         case HW_LCDC_LCM_ARGB8888: return GDI_FORMAT_ARGB8888;
         case HW_LCDC_LCM_RGBA8888: return GDI_FORMAT_RGBA8888;
         case HW_LCDC_LCM_ABGR8888: return GDI_FORMAT_ABGR8888;
@@ -1126,7 +1104,6 @@ bool gdi_get_layer_enable(HW_LCDC_LAYER layer_no)
         return gdi->layer[layer_no].layer_enable;
 }
 
-#if (DEVICE_FAMILY == DA1470X) && (DEVICE_REVISION == DEVICE_REV_A)
 uint32_t * gdi_set_palette_lut(uint32_t *palette_lut)
 {
         ad_lcdc_driver_conf_t *cfg = (ad_lcdc_driver_conf_t *)gdi->config->drv;
@@ -1135,16 +1112,6 @@ uint32_t * gdi_set_palette_lut(uint32_t *palette_lut)
         cfg->palette_lut = palette_lut;
         return palette_lut_old;
 }
-
-int gdi_get_palette_lut(int index, uint32_t *color, int color_num)
-{
-        dev_open_display();
-        int cnt = hw_lcdc_get_palette(index, color, color_num);
-        dev_close_display();
-
-        return cnt;
-}
-#endif /* DEVICE_REVISION */
 
 size_t gdi_setup_layer(HW_LCDC_LAYER layer_no, void *address, gdi_coord_t resx, gdi_coord_t resy, gdi_color_fmt_t format, int buffers)
 {
@@ -1377,32 +1344,6 @@ void gdi_round_partial_update_area(gdi_coord_t *x0, gdi_coord_t *y0, gdi_coord_t
                 gdi->screen_set_partial_update_area(&frame);
         }
 
-#if (DEVICE_FAMILY == DA1469X)
-        /* Verify settings */
-        bool region_mod;
-
-        for (HW_LCDC_LAYER layer = 0; layer < HW_LCDC_LAYER_MAX; layer++) {
-                if (!gdi->layer[layer].layer.baseaddr) {
-                        continue;
-                }
-                do {
-                        gdi->screen_set_partial_update_area(&frame);
-                        region_mod = gdi_verify_update_region(&frame, gdi->layer[layer].layer.format, gdi->layer[layer].layer.dma_prefetch_lvl);
-                        if (region_mod) {
-                                layer = 0;
-                                printf("Region mod %d: (%4d, %4d) -> (%4d, %4d ) [(%4d - %4d), (%4d - %4d) -> (%4d - %4d), (%4d - %4d)]\r\n", layer,
-                                        x1 - x0 + 1,
-                                        y1 - y0 + 1,
-                                        frame.endx - frame.startx + 1,
-                                        frame.endy - frame.starty + 1,
-                                        x0, x1,
-                                        y0, y1,
-                                        frame.startx, frame.endx,
-                                        frame.starty, frame.endy);
-                        }
-                } while (region_mod);
-        }
-#endif /* DEVICE_FAMILY */
 
         *x0 = frame.startx;
         *y0 = frame.starty;
@@ -1464,195 +1405,6 @@ void gdi_set_frame_buffer(HW_LCDC_LAYER layer_no, uint8_t frame)
         gdi->layer[layer_no].layer_dirty = true;
 }
 
-#if 0
-static void dma_cb(void *user_data, dma_size_t len)
-{
-        gdi_dma_t *dma_data = (gdi_dma_t *)user_data;
-        resource_release(dma_data->res);
-        OS_EVENT_SIGNAL_FROM_ISR(dma_data->gdi->dma_event);
-}
-
-static resource_mask_t _gdi_dma_setup(DMA_setup *dma, HW_DMA_CHANNEL ch)
-{
-        dma->channel_number  = ch;
-        dma->dma_prio        = HW_DMA_PRIO_7;
-        dma->burst_mode      = HW_DMA_BURST_MODE_8x;
-        dma->irq_enable      = HW_DMA_IRQ_STATE_ENABLED;
-        dma->dma_idle        = HW_DMA_IDLE_BLOCKING_MODE;
-        dma->bus_width       = HW_DMA_BW_WORD;
-        dma->circular        = HW_DMA_MODE_NORMAL;
-        dma->callback        = NULL;
-        dma->user_data       = NULL;
-        dma->irq_nr_of_trans = 0;
-        dma->dma_init        = HW_DMA_INIT_AX_BX_AY_BY;
-        dma->a_inc           = HW_DMA_AINC_TRUE;
-        dma->b_inc           = HW_DMA_BINC_TRUE;
-        dma->dreq_mode       = HW_DMA_DREQ_START;
-        dma->dma_req_mux     = HW_DMA_TRIG_NONE;
-
-        static const resource_mask_t res_mask[] = {
-                RES_MASK(RES_ID_DMA_CH0), RES_MASK(RES_ID_DMA_CH1),
-                RES_MASK(RES_ID_DMA_CH2), RES_MASK(RES_ID_DMA_CH3),
-                RES_MASK(RES_ID_DMA_CH4), RES_MASK(RES_ID_DMA_CH5),
-                RES_MASK(RES_ID_DMA_CH6), RES_MASK(RES_ID_DMA_CH7)
-        };
-        return res_mask[dma->channel_number];
-}
-
-static void _gdi_memcpy(gdi_dma_t *dma_data, void *dst, const void *src, size_t length)
-{
-        dma_data->gdi = gdi;
-
-        dma_data->dma.src_address = (uint32_t)src;
-        dma_data->dma.dest_address = (uint32_t)dst;
-        dma_data->dma.bus_width = !(length & 3) ? HW_DMA_BW_WORD :
-                              !(length & 1) ? HW_DMA_BW_HALFWORD : HW_DMA_BW_BYTE;
-        dma_data->dma.length =
-                (dma_data->dma.bus_width != 0) ? (length / dma_data->dma.bus_width) : length;
-
-        dma_data->dma.callback = dma_cb;
-        dma_data->dma.user_data = dma_data;
-
-        resource_acquire(dma_data->res, RES_WAIT_FOREVER);
-
-        hw_dma_channel_initialization(&dma_data->dma);
-        hw_dma_channel_enable(dma_data->dma.channel_number, HW_DMA_STATE_ENABLED);
-}
-
-static void _gdi_buffer_memcpy(HW_LCDC_LAYER layer_no, uint8_t dst, uint8_t src)
-{
-        gdi_dma_t dma_data;
-        dma_data.res = _gdi_dma_setup(&dma_data.dma, HW_DMA_CHANNEL_0);
-
-        _gdi_memcpy(&dma_data, gdi->layer[layer_no].buffer[dst], gdi->layer[layer_no].buffer[src], gdi->layer[layer_no].single_buff_sz);
-
-        OS_EVENT_WAIT(gdi->dma_event, OS_EVENT_FOREVER);
-}
-
-static void dma_2d_cb(void *user_data, dma_size_t len)
-{
-        gdi_dma_t *data = (gdi_dma_t *)user_data;
-        if (!data->reps--) {
-                resource_release(data->res);
-                OS_EVENT_SIGNAL_FROM_ISR(data->gdi->dma_event);
-                return;
-        }
-
-        data->dst += data->dst_step;
-        data->src += data->src_step;
-
-        hw_dma_channel_update_source(data->dma.channel_number, (void *)data->src, data->dma.length, data->dma.callback);
-        hw_dma_channel_update_destination(data->dma.channel_number, (void *)data->dst, data->dma.length, data->dma.callback);
-        hw_dma_channel_enable(data->dma.channel_number, HW_DMA_STATE_ENABLED);
-}
-
-static void _gdi_memcpy_2d(gdi_dma_t *dma_data, void *dst, const void *src, size_t length, int dst_step, int src_step, size_t reps)
-{
-        dma_data->gdi = gdi;
-
-        dma_data->dma.bus_width = !(length & 3) ? HW_DMA_BW_WORD :
-                                 !(length & 1) ? HW_DMA_BW_HALFWORD : HW_DMA_BW_BYTE;
-        dma_data->dst_step = dst_step;
-        dma_data->src_step = src_step;
-
-        dma_data->dma.callback = dma_2d_cb;
-        dma_data->dma.user_data = dma_data;
-
-        dma_data->dst = (uint32_t)dst;
-        dma_data->src = (uint32_t)src;
-        dma_data->reps = reps;
-
-        dma_data->dma.src_address = dma_data->src;
-        dma_data->dma.dest_address = dma_data->dst;
-        dma_data->dma.length =
-                (dma_data->dma.bus_width != 0) ? (length / dma_data->dma.bus_width) : length;
-
-        resource_acquire(dma_data->res, RES_WAIT_FOREVER);
-
-        hw_dma_channel_initialization(&dma_data->dma);
-        hw_dma_channel_enable(dma_data->dma.channel_number, HW_DMA_STATE_ENABLED);
-}
-
-void gdi_memmove(void *dst, const void *src, size_t length)
-{
-        gdi_dma_t dma_data;
-        int dist = (size_t)((uint8_t *)dst - (uint8_t *)src);
-        dma_data.res = _gdi_dma_setup(&dma_data.dma, HW_DMA_CHANNEL_0);
-
-        if (dst == src) {
-                return;
-        } else if (dist > length || dist < 0) {
-                _gdi_memcpy(&dma_data, dst, src, length);
-        } else {
-                _gdi_memcpy_2d(&dma_data, dst + length - dist, src + length - dist, dist, -dist, -dist, length / dist);
-                _gdi_memcpy(&dma_data, dst, src, length % dist);
-        }
-
-        OS_EVENT_WAIT(gdi->dma_event, OS_EVENT_FOREVER);
-}
-
-void gdi_memcpy_2d(void *dst, const void *src, size_t length, int dst_step, int src_step, size_t reps)
-{
-        gdi_dma_t dma_data;
-        dma_data.res = _gdi_dma_setup(&dma_data.dma, HW_DMA_CHANNEL_0);
-
-        _gdi_memcpy_2d(&dma_data, dst, src, length, dst_step, src_step, reps);
-
-        OS_EVENT_WAIT(gdi->dma_event, OS_EVENT_FOREVER);
-}
-
-static void _gdi_buffer_memcpy_2d(HW_LCDC_LAYER layer_no, uint8_t dst, uint8_t src0, uint8_t src1, bool seq, bool dir)
-{
-        void *dst_addr;
-        const void *src_addr;
-        size_t length, dst_step, src_step, reps;
-        gdi_dma_t dma0_data, dma1_data;
-        int32_t stride = gdi->layer[layer_no].layer.stride;
-        dma0_data.res = _gdi_dma_setup(&dma0_data.dma, HW_DMA_CHANNEL_0);
-        dma1_data.res = _gdi_dma_setup(&dma1_data.dma, HW_DMA_CHANNEL_1);
-
-        length = calc_stride(gdi->layer[layer_no].layer.format, gdi->width);
-
-        dst_step = dir ? stride : stride;
-        dst_step *= 2;
-        src_step = dir ? -stride : stride;
-        reps = gdi->height - 1;
-
-        if (dir) {
-                dst_addr = (void *)((uint32_t)gdi->layer[layer_no].buffer[dst] + 2 * stride * (gdi->height - 1) + (seq ? stride : 0));
-                src_addr = (void *)((uint32_t)gdi->layer[layer_no].buffer[src0] + stride * (gdi->height - 1));
-        } else {
-                dst_addr = (void *)((uint32_t)gdi->layer[layer_no].buffer[dst] + (seq ? stride : 0));
-                src_addr = (void *)((uint32_t)gdi->layer[layer_no].buffer[src0]);
-        }
-
-        _gdi_memcpy_2d(&dma0_data, dst_addr, src_addr, length, dst_step, src_step, reps);
-
-        OS_EVENT_WAIT(gdi->dma_event, OS_EVENT_FOREVER);
-
-        if (dir) {
-                dst_addr = (void *)((uint32_t)gdi->layer[layer_no].buffer[dst] + 2 * stride * (gdi->height - 1) + (seq ? 0 : stride));
-                src_addr = (void *)((uint32_t)gdi->layer[layer_no].buffer[src1] + stride * (gdi->height - 1));
-        } else {
-                dst_addr = (void *)((uint32_t)gdi->layer[layer_no].buffer[dst] + (seq ? 0 : stride));
-                src_addr = (void *)((uint32_t)gdi->layer[layer_no].buffer[src1]);
-        }
-
-        _gdi_memcpy_2d(&dma1_data, dst_addr, src_addr, length, dst_step, src_step, reps);
-
-        OS_EVENT_WAIT(gdi->dma_event, OS_EVENT_FOREVER);
-}
-
-void gdi_buffer_memcpy(HW_LCDC_LAYER dst_layer, uint8_t dst, HW_LCDC_LAYER src_layer, uint8_t src)
-{
-        gdi_dma_t dma_data;
-        dma_data.res = _gdi_dma_setup(&dma_data.dma, HW_DMA_CHANNEL_0);
-
-        _gdi_memcpy(&dma_data, gdi->layer[dst_layer].buffer[dst], gdi->layer[src_layer].buffer[src], gdi->layer[dst_layer].single_buff_sz);
-
-        OS_EVENT_WAIT(gdi->dma_event, OS_EVENT_FOREVER);
-}
-#endif
 
 void *_gdi_get_frame_buffer_addr(void)
 {
@@ -1692,116 +1444,6 @@ void *gdi_get_gui_heap_addr(void)
 #endif /* GDI_NO_PREALLOC */
 }
 
-#if (DEVICE_FAMILY == DA1469X)
-/**
- * \brief Verify that the provided layer settings (frame, color mode and prefetch level) are a valid
- * combination and if not modify them accordingly.
- *
- * This function should be called prior to setting the update region with function
- * hw_lcdc_set_update_region() in order to ensure that the layer part that is transfered can meet
- * the size requirements.
- *
- * \param[in,out] frame         Frame dimensions of the layer part. Can be modified by this function.
- * \param[in] color             Color mode of the layer (\sa HW_LCDC_LAYER_COLOR_MODE)
- * \param[in] lvl               Prefetch level of the layer (\sa HW_LCDC_FIFO_PREFETCH_LVL)
- *
- * \return True if the frame dimensions have been modified, false otherwise.
- */
-static bool gdi_verify_update_region(hw_lcdc_frame_t *frame, HW_LCDC_LAYER_COLOR_MODE color,
-        HW_LCDC_FIFO_PREFETCH_LVL lvl)
-{
-        int prefetch_limit, fifo_sz, effective_fifo_sz, word_offset, words_per_line, min_lines;
-        int width, height, y_diff = 0;
-        uint8_t format_sz, offset_msk;
-        bool ret = false;
-        static const uint8_t prefetch_lut[] = {
-                [HW_LCDC_FIFO_PREFETCH_LVL_DISABLED] = 0,
-                [HW_LCDC_FIFO_PREFETCH_LVL_1] = 52,
-                [HW_LCDC_FIFO_PREFETCH_LVL_2] = 84,
-                [HW_LCDC_FIFO_PREFETCH_LVL_3] = 116,
-                [HW_LCDC_FIFO_PREFETCH_LVL_4] = 108,
-        };
-
-        width = frame->endx - frame->startx + 1;
-        height = frame->endy - frame->starty + 1;
-
-        /* If columns are less than 4, increase the update area */
-        /* Firstly check how much can be increased on the left */
-        if (width < 4) {
-                uint16_t dec_startx = MIN(4 - width, frame->startx);
-                frame->startx -= dec_startx;
-                width += dec_startx;
-                ret = true;
-        }
-        /* If increase on the left not sufficient (too close to the border), increase the rest on
-         * the right. No need to perform a limit check since we have reached the left border of the
-         * screen */
-        if (width < 4) {
-                frame->endx += 4 - width;
-                width = 4;
-                ret = true;
-        }
-
-        if (!prefetch_lut[lvl]) {
-                return ret;
-        }
-
-        switch (color) {
-        case HW_LCDC_LCM_RGBA8888:
-                format_sz =  4;
-                break;
-        case HW_LCDC_LCM_RGB565:
-                format_sz =  2;
-                break;
-        default:
-                return ret;
-        }
-
-        fifo_sz = 128 / 4 + 3;
-        prefetch_limit = prefetch_lut[lvl] / 4 - 4 / format_sz;
-        offset_msk = 4 / format_sz - 1;
-
-        do {
-                word_offset = frame->startx & offset_msk;
-                words_per_line = CEILING_FUNC((width + word_offset) * format_sz, 4);
-                min_lines = prefetch_limit / words_per_line + 1;
-                if (min_lines > 1) {
-                        if (min_lines == 2) {
-                                effective_fifo_sz = fifo_sz + format_sz - 1;
-                        } else {
-                                effective_fifo_sz = fifo_sz;
-                        }
-                        if (FLOOR_FUNC(effective_fifo_sz, words_per_line) <= prefetch_limit) {
-                                /* Increase width */
-                                if (frame->startx) {
-                                        frame->startx--;
-                                } else {
-                                        frame->endx++;
-                                }
-                                width++;
-                                ret = true;
-                                continue;
-                        } else if (height < min_lines) {
-                                /* Increase height */
-                                y_diff = min_lines - height;
-                        }
-                }
-                break;
-        } while (true);
-
-        if (y_diff) {
-                uint16_t dec_starty = MIN(y_diff, frame->starty);
-                frame->starty -= dec_starty;
-                y_diff -= dec_starty;
-                if (y_diff) {
-                        frame->endy += y_diff;
-                }
-                ret = true;
-        }
-
-        return ret;
-}
-#endif
 
 #endif /* dg_configLCDC_ADAPTER */
 /**

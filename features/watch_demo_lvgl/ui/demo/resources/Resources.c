@@ -1,20 +1,43 @@
 /**
  ****************************************************************************************
  *
- * @file Resources.c
+ * @file resources.h
+ *
+ * @file resources.c
  *
  * @brief Resources - bitmaps stored in flash source file
  *
- * Copyright (C) 2021-2022 Dialog Semiconductor.
- * This computer program includes Confidential, Proprietary Information
- * of Dialog Semiconductor. All Rights Reserved.
+ * This software ("Software") is owned by Dialog Semiconductor. By using this Software
+ * you agree that Dialog Semiconductor retains all intellectual property and proprietary
+ * rights in and to this Software and any use, reproduction, disclosure or distribution
+ * of the Software without express written permission or a license agreement from Dialog
+ * Semiconductor is strictly prohibited. This Software is solely for use on or in
+ * conjunction with Dialog Semiconductor products.
+ *
+ * EXCEPT AS OTHERWISE PROVIDED IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR AS
+ * REQUIRED BY LAW, THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. EXCEPT AS OTHERWISE PROVIDED
+ * IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR BY LAW, IN NO EVENT SHALL DIALOG
+ * SEMICONDUCTOR BE LIABLE FOR ANY DIRECT, SPECIAL, INDIRECT, INCIDENTAL, OR
+ * CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE SOFTWARE.
  *
  ****************************************************************************************
  */
 #include "Resources.h"
 
+#define AT_XIP_FLASH                    (1)
+#define AT_S_FLASH                      (2)
+#define RESOURCES_LOCATION              AT_S_FLASH
+#if (RESOURCES_LOCATION == AT_XIP_FLASH)
 #define RESOURCES_OFFSET                (0x100000)
 #define RESOURCES_BASE_ADDRESS          (MEMORY_OQSPIC_S_BASE + RESOURCES_OFFSET)
+#elif (RESOURCES_LOCATION == AT_S_FLASH)
+#define RESOURCES_OFFSET                (0x0)
+#define RESOURCES_BASE_ADDRESS          (MEMORY_QSPIC_BASE + RESOURCES_OFFSET)
+#endif
 
 #define HEADER_OFFSET                   (sizeof(lv_img_header_t))
 

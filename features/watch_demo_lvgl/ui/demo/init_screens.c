@@ -5,9 +5,24 @@
  *
  * @brief Initialize screens source file
  *
- * Copyright (C) 2021-2022 Dialog Semiconductor.
- * This computer program includes Confidential, Proprietary Information
- * of Dialog Semiconductor. All Rights Reserved.
+ * Copyright (c) 2022 Dialog Semiconductor. All rights reserved.
+ *
+ * This software ("Software") is owned by Dialog Semiconductor. By using this Software
+ * you agree that Dialog Semiconductor retains all intellectual property and proprietary
+ * rights in and to this Software and any use, reproduction, disclosure or distribution
+ * of the Software without express written permission or a license agreement from Dialog
+ * Semiconductor is strictly prohibited. This Software is solely for use on or in
+ * conjunction with Dialog Semiconductor products.
+ *
+ * EXCEPT AS OTHERWISE PROVIDED IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR AS
+ * REQUIRED BY LAW, THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. EXCEPT AS OTHERWISE PROVIDED
+ * IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR BY LAW, IN NO EVENT SHALL DIALOG
+ * SEMICONDUCTOR BE LIABLE FOR ANY DIRECT, SPECIAL, INDIRECT, INCIDENTAL, OR
+ * CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE SOFTWARE.
  *
  ****************************************************************************************
  */
@@ -15,6 +30,7 @@
  *      INCLUDES
  *****************************************************************************************
  */
+
 #include "screens/watch_face_screen.h"
 #include "screens/menu_list_screen.h"
 #include "module.h"
@@ -91,26 +107,35 @@ static void lv_propagate_to_children(lv_obj_t *parent, lv_event_code_t code)
 
 static void scroll_event_cb(lv_event_t *e)
 {
-        static lv_coord_t prev_sx = 0;
         static int completed_scroll_cnt = 0;
-        lv_coord_t scroll_dx, sx;
         lv_event_code_t code = lv_event_get_code(e);
 
 #if TWO_LAYERS_HORIZONTAL_SLIDING
+        static lv_coord_t prev_sx = 0;
         static int position = 0;
         int posXLayer0 = 0, posXLayer1 = DEMO_RESX;
-        lv_dir_t dir = LV_DIR_NONE;
+        static lv_dir_t dir = LV_DIR_NONE;
+        lv_coord_t scroll_dx, sx;
 #endif
 
         if (code == LV_EVENT_SCROLL_BEGIN || code == LV_EVENT_SCROLL
                 || code == LV_EVENT_SCROLL_END) {
                 lv_obj_t *obj = lv_event_get_target(e);
+#if TWO_LAYERS_HORIZONTAL_SLIDING
                 sx = lv_obj_get_scroll_x(obj);
                 scroll_dx = prev_sx - sx;
+                prev_sx = sx;
+#endif
 
                 if (code == LV_EVENT_SCROLL_BEGIN) {
                         if (completed_scroll_cnt == 0) {
                                 lv_propagate_to_children(obj, code);
+#ifdef PERFORMANCE_METRICS
+                                OS_ENTER_CRITICAL_SECTION();
+                                metrics_set_tag(METRICS_TAG_SLIDING_WATCH_FACE_TO_MENU);
+                                OS_LEAVE_CRITICAL_SECTION();
+#endif
+
 #if TWO_LAYERS_HORIZONTAL_SLIDING
                                 /* Change Rect values of all related windows to draw the second FB */
                                 if (lv_obj_get_scroll_right(obj) == DEMO_RESX) { //watch -> menu
@@ -131,25 +156,11 @@ static void scroll_event_cb(lv_event_t *e)
                         /* 2 Layers sliding */
                         position += scroll_dx;
 
-                        if (scroll_dx < 0) {
-                                if (prev_sx >= DEMO_RESX) {
-                                        // watch -> nothing, Layer position remains the same
-                                        posXLayer0 = DEMO_RESX;
-                                }
-                                else {
-                                        // watch -> menu, change Layer position
-                                        posXLayer0 = DEMO_RESX + position;
-                                }
+                        if (dir == LV_DIR_RIGHT) {
+                                posXLayer0 = DEMO_RESX + position;
                         }
-                        else {
-                                if (prev_sx <= 0) {
-                                        // menu -> nothing, Layer position remains the same
-                                        posXLayer0 = -DEMO_RESX;
-                                }
-                                else {
-                                        // menu -> watch, change Layer position
-                                        posXLayer0 = position - DEMO_RESX;
-                                }
+                        else if (dir == LV_DIR_LEFT) {
+                                posXLayer0 = position - DEMO_RESX;
                         }
                         posXLayer1 = position;
 
@@ -177,6 +188,5 @@ static void scroll_event_cb(lv_event_t *e)
                         }
                         completed_scroll_cnt--;
                 }
-                prev_sx = sx;
         }
 }

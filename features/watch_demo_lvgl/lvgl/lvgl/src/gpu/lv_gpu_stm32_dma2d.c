@@ -121,36 +121,6 @@ void lv_gpu_stm32_dma2d_fill(lv_color_t * buf, lv_coord_t buf_w, lv_color_t colo
 void lv_gpu_stm32_dma2d_fill_mask(lv_color_t * buf, lv_coord_t buf_w, lv_color_t color, const lv_opa_t * mask,
                                   lv_opa_t opa, lv_coord_t fill_w, lv_coord_t fill_h)
 {
-#if 0
-    invalidate_cache();
-
-    /*Configure the DMA2D Mode, Color Mode and line output offset*/
-    hdma2d.Init.Mode         = DMA2D_M2M_BLEND;
-    hdma2d.Init.ColorMode    = DMA2D_OUTPUT_FORMAT;
-    hdma2d.Init.OutputOffset = buf_w - fill_w;
-
-    /*Configure the foreground -> The character*/
-    lv_color32_t c32;
-    c32.full = lv_color_to32(color);
-    c32.ch.alpha = opa;
-    hdma2d.LayerCfg[1].AlphaMode       = DMA2D_COMBINE_ALPHA;
-    hdma2d.LayerCfg[1].InputAlpha      = c32.full;
-    hdma2d.LayerCfg[1].InputColorMode  = DMA2D_INPUT_A8;
-    hdma2d.LayerCfg[1].InputOffset     = 0;
-
-    /*Configure the background -> Display buffer*/
-    hdma2d.LayerCfg[0].AlphaMode       = DMA2D_NO_MODIF_ALPHA;
-    hdma2d.LayerCfg[0].InputAlpha      = 0x00;
-    hdma2d.LayerCfg[0].InputColorMode  = DMA2D_INPUT_FORMAT;
-    hdma2d.LayerCfg[0].InputOffset     = buf_w - fill_w;
-
-    /*DMA2D Initialization*/
-    HAL_DMA2D_Init(&hdma2d);
-    HAL_DMA2D_ConfigLayer(&hdma2d, 0);
-    HAL_DMA2D_ConfigLayer(&hdma2d, 1);
-    HAL_DMA2D_BlendingStart(&hdma2d, (uint32_t) mask, (uint32_t) buf, (uint32_t)buf, fill_w, fill_h);
-    wait_finish();
-#endif
 }
 
 /**
