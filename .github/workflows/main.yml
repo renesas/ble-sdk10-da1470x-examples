@@ -36,7 +36,7 @@ jobs:
 
       - name: Copy SDK files from AWS
         run: |
-          aws s3 cp s3://dlglpcgithubci/sdk/SDK_10.2.4.44.cs_release.1 ..
+          aws s3 cp s3://dlglpcgithubci/sdk/SDK_10.2.4.44.cs_release.1.zip ..
          
       - name: Unzip SDK
         run: |
