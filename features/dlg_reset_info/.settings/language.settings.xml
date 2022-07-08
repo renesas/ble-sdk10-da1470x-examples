@@ -23,7 +23,7 @@
         	
     </configuration>
     	
-    <configuration id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.76586611.1007346875.660827118.235708102.1847866934.384067096.802618131" name="DA1470x-00-Release_OQSPI">
+    <configuration id="ilg.gnuarmeclipse.managedbuild.cross.config.elf.debug.76586611.1007346875.660827118.235708102.1847866934.384067096.1462864541" name="DA1470x-00-Release_OQSPI">
         		
         <extension point="org.eclipse.cdt.core.LanguageSettingsProvider">
             			
