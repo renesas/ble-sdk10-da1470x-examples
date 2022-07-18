@@ -2,9 +2,7 @@
 
 #include <stdint.h>
 #include <string.h>
-#include <stdio.h>
 #include "cmsis_gcc.h"
-#include "sdk_defs.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "hw_hard_fault.h"

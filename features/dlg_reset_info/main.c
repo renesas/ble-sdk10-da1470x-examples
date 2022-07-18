@@ -14,13 +14,7 @@
 
 #include <string.h>
 #include <stdio.h>
-#include <stdbool.h>
 
-#include "osal.h"
-#include "resmgmt.h"
-#include "hw_cpm.h"
-#include "hw_gpio.h"
-#include "hw_watchdog.h"
 #include "sys_clock_mgr.h"
 #include "sys_power_mgr.h"
 #include "hw_wkup.h"

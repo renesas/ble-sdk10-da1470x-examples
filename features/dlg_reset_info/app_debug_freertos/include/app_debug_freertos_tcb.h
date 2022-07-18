@@ -32,7 +32,6 @@
 #define __APP_DEBUG_FREERTOS_TCB_H__
 
 
-#include <stdbool.h>
 #include <stdint.h>
 
 
