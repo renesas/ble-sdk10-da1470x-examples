@@ -8,10 +8,10 @@ This module relies on uninitialized RAM, a few minor modifications to the SDK an
 ## HW & SW Configurations
 
 - **Hardware Configurations**
-  - This example runs on a DA1469x Bluetooth Smart SoC.
-  - A DA1469x Pro Development Kit or USB kit is needed for this example (KEY1_PORT and KEY1_PIN should be modified for USB Kit functionality).
+  - This example runs on a DA1470x Bluetooth Smart SoC.
+  - A DA1470x Pro Development Kit or USB kit is needed for this example (KEY1_PORT and KEY1_PIN should be modified for USB Kit functionality).
 - **Software Configurations**
-  - Download the latest SDK version for the DA1469x family of devices (10.0.10.x)
+  - Download the latest SDK version for the DA1470x family of devices (10.2.4.x or newer)
   - **SEGGER's J-Link** tools should be downloaded and installed.
 
 ## SDK Modifications
@@ -219,7 +219,7 @@ Each piece of information is serialized in the following ADF Frame formats and c
 
   ## Additional Notes and Limitations
 
-  1. It's possible that a value on the call stack is not an address, but an argument.  Happens in the case where an odd value in place on the stack and aligns with an executable address.  
+  1. It's possible that a value on the call stack is not an address, but an argument.  Happens in the case where an odd value is placed on the stack and aligns with an executable address.  
   2. If you get an exception for ADF_TYPE_CMAC_TRACE, please provide this data back to your local Dialog Representative.  
   
 

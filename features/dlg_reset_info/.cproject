@@ -557,6 +557,10 @@
             		
         </configuration>
         		
+        <configuration configurationName="DA1470x-00-Release_OQSPI"/>
+        		
+        <configuration configurationName="DA1470x-00-Debug_OQSPI"/>
+        		
         <configuration configurationName="DA1469x-00-Release_QSPI">
             			
             <resource resourceType="PROJECT" workspacePath="/dlg_reset_info"/>
