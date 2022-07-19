@@ -3,11 +3,26 @@
  *
  * @file main.c
  *
- * @brief LCD Controller Demo application
+ * @brief main implementation for watch lvgl demo example .
  *
- * Copyright (C) 2021-2022 Dialog Semiconductor.
- * This computer program includes Confidential, Proprietary Information
- * of Dialog Semiconductor. All Rights Reserved.
+ * Copyright (c) 2022 Dialog Semiconductor. All rights reserved.
+ *
+ * This software ("Software") is owned by Dialog Semiconductor. By using this Software
+ * you agree that Dialog Semiconductor retains all intellectual property and proprietary
+ * rights in and to this Software and any use, reproduction, disclosure or distribution
+ * of the Software without express written permission or a license agreement from Dialog
+ * Semiconductor is strictly prohibited. This Software is solely for use on or in
+ * conjunction with Dialog Semiconductor products.
+ *
+ * EXCEPT AS OTHERWISE PROVIDED IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR AS
+ * REQUIRED BY LAW, THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. EXCEPT AS OTHERWISE PROVIDED
+ * IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR BY LAW, IN NO EVENT SHALL DIALOG
+ * SEMICONDUCTOR BE LIABLE FOR ANY DIRECT, SPECIAL, INDIRECT, INCIDENTAL, OR
+ * CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE SOFTWARE.
  *
  ****************************************************************************************
  */
@@ -58,6 +73,11 @@ const unsigned char ucExpectedInterruptStackValues[] = { 0xCC, 0xCC, 0xCC, 0xCC,
 INITIALISED_PRIVILEGED_DATA int8_t idle_task_wdog_id = -1;
 #endif
 
+extern void MainTask(void);
+#ifdef PERFORMANCE_METRICS
+extern void UISimulationTask(void);
+#endif
+
 /*
  * Perform any application specific hardware configuration.  The clocks,
  * memory, etc. are configured before main() is called.
@@ -77,9 +97,9 @@ static void system_init(void *pvParameters)
 #endif
         sys_clk_t sys_clk_prio[5] = {
                 sysclk_PLL160,
+                sysclk_XTAL32M,
                 sysclk_RCHS_96,
                 sysclk_RCHS_32,
-                sysclk_XTAL32M,
                 sysclk_RCHS_64,
         };
 
@@ -117,15 +137,7 @@ static void system_init(void *pvParameters)
 #if defined CONFIG_RETARGET
         retarget_init();
 #endif
-#if (DEVICE_FAMILY == DA1469X)
-        cm_sys_clk_request(sysclk_PLL96);
-#elif (DEVICE_FAMILY == DA1470X)
-#if DEVICE_FPGA
-        cm_sys_clk_request(sysclk_XTAL32M);
-#else
         cm_sys_clk_request(AD_LCDC_DEFAULT_CLK);
-#endif /* DEVICE_FPGA */
-#endif
 
         printf("Watch demo\r\nInitializing task...\r\n");
         MainTask();
@@ -249,10 +261,8 @@ static void _wkup_init(void)
                 hw_wkup_register_gpio_p0_interrupt(_wkup_gpio_cb, 1);
         } else if (TOUCH_INT_PORT == HW_GPIO_PORT_1) {
                 hw_wkup_register_gpio_p1_interrupt(_wkup_gpio_cb, 1);
-#if (DEVICE_FAMILY == DA1470X)
         } else if (TOUCH_INT_PORT == HW_GPIO_PORT_2) {
                 hw_wkup_register_gpio_p2_interrupt(_wkup_gpio_cb, 1);
-#endif
         }
 
         /* Add PDC LUT entry for events triggered on P0 */
@@ -292,6 +302,9 @@ static void prvSetupHardware(void)
         /* Init hardware */
         pm_system_init(periph_init);
 
+        /*
+         * 1V8 rail configuration
+         */
         ad_pmu_rail_config_t v18_rail_config;
 
         v18_rail_config.enabled_onwakeup = true;
@@ -301,6 +314,20 @@ static void prvSetupHardware(void)
         v18_rail_config.rail_1v8.voltage_common = HW_PMU_1V8_VOLTAGE_1V8;
 
         ad_pmu_configure_rail(PMU_RAIL_1V8, &v18_rail_config);
+
+        /*
+         * 3V0 rail configuration
+         */
+        ad_pmu_rail_config_t v30_rail_config;
+
+        v30_rail_config.enabled_onwakeup = true;
+        v30_rail_config.enabled_onsleep = true;
+        v30_rail_config.rail_3v0.voltage_onwakeup = HW_PMU_3V0_VOLTAGE_3V0;
+        v30_rail_config.rail_3v0.voltage_onsleep = HW_PMU_3V0_VOLTAGE_SLEEP_3V0;
+        v30_rail_config.rail_3v0.current_onwakeup = HW_PMU_3V0_MAX_LOAD_160;
+        v30_rail_config.rail_3v0.current_onsleep = HW_PMU_3V0_MAX_LOAD_160;
+
+        ad_pmu_configure_rail(PMU_RAIL_3V0, &v30_rail_config);
 
 #if dg_configUSE_HW_WKUP && defined(TOUCH_INT_PORT) && !dg_configUSE_TOUCH_SIMULATION
         /* Setup interrupt for external sources */
@@ -325,11 +352,7 @@ static void prvSetupHardware(void)
 
 #if dg_configLCDC_ADAPTER
 
-#if dg_configUSE_HM80160A090
-        ad_lcdc_io_config(&hm80160a090_io, AD_IO_CONF_OFF);
-#elif dg_configUSE_E1394AA65A
-        ad_lcdc_io_config(&e1394aa65a_io, AD_IO_CONF_OFF);
-#elif dg_configUSE_LPM012M134B
+#if   dg_configUSE_LPM012M134B
         ad_lcdc_io_config(&lpm012m134b_io, AD_IO_CONF_OFF);
 #elif dg_configUSE_NHD43480272EFASXN
         ad_lcdc_io_config(&nhd43480272efasxn_io, AD_IO_CONF_OFF);

@@ -5,9 +5,24 @@
  *
  * @brief LCD configuration for T1D3BP006 with IC ST7789V2
  *
- * Copyright (C) 2020-2022 Dialog Semiconductor.
- * This computer program includes Confidential, Proprietary Information
- * of Dialog Semiconductor. All Rights Reserved.
+ * Copyright (c) 2022 Dialog Semiconductor. All rights reserved.
+ *
+ * This software ("Software") is owned by Dialog Semiconductor. By using this Software
+ * you agree that Dialog Semiconductor retains all intellectual property and proprietary
+ * rights in and to this Software and any use, reproduction, disclosure or distribution
+ * of the Software without express written permission or a license agreement from Dialog
+ * Semiconductor is strictly prohibited. This Software is solely for use on or in
+ * conjunction with Dialog Semiconductor products.
+ *
+ * EXCEPT AS OTHERWISE PROVIDED IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR AS
+ * REQUIRED BY LAW, THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. EXCEPT AS OTHERWISE PROVIDED
+ * IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR BY LAW, IN NO EVENT SHALL DIALOG
+ * SEMICONDUCTOR BE LIABLE FOR ANY DIRECT, SPECIAL, INDIRECT, INCIDENTAL, OR
+ * CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE SOFTWARE.
  *
  ****************************************************************************************
  */
@@ -36,6 +51,7 @@
 #define GDI_LCDC_CONFIG                 (&t1d3bp006_cfg)
 #define GDI_USE_CONTINUOUS_MODE         (0)
 #define T1D3BP006_SPI3                  (0)
+#define T1D3BP006_SPI3_TE_ENABLE        (0)
 
 /*
  * static const ad_io_conf_t t1d3bp006_gpio_cfg[] = {
@@ -49,7 +65,7 @@
 
  * const ad_lcdc_io_conf_t t1d3bp006_io = {
  *       .voltage_level = HW_GPIO_POWER_V33,
- *       .io_cnt = sizeof(t1d3bp006_gpio_cfg) / sizeof(t1d3bp006_gpio_cfg[0]),
+ *       .io_cnt = ARRAY_LENGTH(t1d3bp006_gpio_cfg),
  *       .io_list = t1d3bp006_gpio_cfg,
  * };
  */
@@ -64,7 +80,7 @@ static GDI_DRV_CONF_ATTR ad_lcdc_driver_conf_t t1d3bp006_drv = {
         .hw_init.write_freq = LCDC_FREQ_48MHz, //62.5MHz
         .hw_init.read_freq = LCDC_FREQ_6MHz,   //6.6MHz
         .ext_clk = HW_LCDC_EXT_CLK_OFF,
-        .te_enable = false, //true,
+        .te_enable = T1D3BP006_SPI3_TE_ENABLE ? true : false,
         .te_mode = HW_LCDC_TE_POL_LOW,
 };
 
@@ -132,7 +148,11 @@ static const uint8_t screen_init_cmds[] = {
                            GDI_DISP_COLOR == HW_LCDC_OCM_8RGB565 ? T1D3BP006_PIXEL_FORMAT_RGB565 :
                                                                    T1D3BP006_PIXEL_FORMAT_RGB666),
 
+#if T1D3BP006_SPI3_TE_ENABLE
         LCDC_MIPI_SET_TEAR_ON(0x00),
+#else
+        LCDC_MIPI_CMD_DATA(HW_LCDC_MIPI_DCS_SET_TEAR_OFF),
+#endif
 };
 
 static const uint8_t screen_power_on_cmds[] = {

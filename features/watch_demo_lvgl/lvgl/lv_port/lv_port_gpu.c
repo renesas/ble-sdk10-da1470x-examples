@@ -5,9 +5,24 @@
  *
  * @brief GPU driver
  *
- * Copyright (C) 2021-2022 Dialog Semiconductor.
- * This computer program includes Confidential, Proprietary Information
- * of Dialog Semiconductor. All Rights Reserved.
+ * Copyright (c) 2022 Dialog Semiconductor. All rights reserved.
+ *
+ * This software ("Software") is owned by Dialog Semiconductor. By using this Software
+ * you agree that Dialog Semiconductor retains all intellectual property and proprietary
+ * rights in and to this Software and any use, reproduction, disclosure or distribution
+ * of the Software without express written permission or a license agreement from Dialog
+ * Semiconductor is strictly prohibited. This Software is solely for use on or in
+ * conjunction with Dialog Semiconductor products.
+ *
+ * EXCEPT AS OTHERWISE PROVIDED IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR AS
+ * REQUIRED BY LAW, THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. EXCEPT AS OTHERWISE PROVIDED
+ * IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR BY LAW, IN NO EVENT SHALL DIALOG
+ * SEMICONDUCTOR BE LIABLE FOR ANY DIRECT, SPECIAL, INDIRECT, INCIDENTAL, OR
+ * CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE SOFTWARE.
  *
  ****************************************************************************************
  */
@@ -751,9 +766,6 @@ static int lv_port_gpu_hw_init(void)
         if (d2_handle == NULL)
                 return 0;
 
-        /* Set the maximum burst length of the master bus interfaces to 8 beats*/
-        d2_inithwburstlengthlimit(d2_handle, d2_bbl_8, d2_bbl_8, d2_bbl_8, d2_bbl_8);
-
         /* set blocksize for default displaylist */
         if (d2_setdlistblocksize(d2_handle, 25) != D2_OK) {
                 printf("Could NOT d2_setdlistblocksize\n");
@@ -979,18 +991,18 @@ static void lv_port_gpu_complete_render(void)
 {
         if (d2_handle) {
                 D2_EXEC(d2_flushframe(d2_handle));
-        }
 
 #ifdef PERFORMANCE_METRICS
-        d2_slong render_op_time = 0;
-        d2_u32 render_op_duration_us = 0;
+                d2_slong render_op_time = 0;
+                d2_u32 render_op_duration_us = 0;
 
-        render_op_time = d2_getperfcountvalue(d2_handle, 0);
-        render_op_duration_us = render_op_time / (d1_deviceclkfreq(d2_handle, D1_DAVE2D) / 1000000);
-        d2_setperfcountvalue(d2_handle, 0, 0);
+                render_op_time = d2_getperfcountvalue(d2_handle, 0);
+                render_op_duration_us = render_op_time / (d1_deviceclkfreq(d2_handle, D1_DAVE2D) / 1000000);
+                d2_setperfcountvalue(d2_handle, 0, 0);
 
-        gdi_perf_render_op_time(render_op_duration_us, metrics_tag);
+                gdi_perf_render_op_time(render_op_duration_us, metrics_tag);
 #endif
+        }
 }
 
 #ifdef LOG_ERRORS

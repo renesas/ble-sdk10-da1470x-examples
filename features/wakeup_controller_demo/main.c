@@ -264,7 +264,7 @@ static OS_TASK_FUNCTION(extWakeUpTriggerTask, pvParameters)
 {
         uint32_t ulNotifiedValue;
 
-        printf("Wake-up Controller Demonstration Sample Code.\n\r");
+        printf("Wake-up Controller Demonstration Sample Code.\r\n");
 
 #if dg_configUSE_WDOG
         int8_t wakeup_task_wdog_id = -1;
@@ -292,19 +292,19 @@ static OS_TASK_FUNCTION(extWakeUpTriggerTask, pvParameters)
                 /* Check the notification is the expected value */
 
                 if(ulNotifiedValue & WKUP_KEY_PRESS_EVENT_NOTIF) {
-                        printf("Key press occurred\n\r");
+                        printf("Key press occurred\r\n");
                 }
 
                 if(ulNotifiedValue & WKUP_KEY_RELEASE_EVENT_NOTIF) {
-                        printf("Key release occurred\n\r");
+                        printf("Key release occurred\r\n");
                 }
 
                 if(ulNotifiedValue & WKUP_GPIO_P1_EVENT_NOTIF_LOW) {
-                        printf("GPIO pulse low occurred\n\r");
+                        printf("GPIO pulse low occurred\r\n");
                 }
 
                 if(ulNotifiedValue & WKUP_GPIO_P1_EVENT_NOTIF_HIGH) {
-                        printf("GPIO pulse high occurred\n\r");
+                        printf("GPIO pulse high occurred\r\n");
                 }
 
                 fflush(stdout);

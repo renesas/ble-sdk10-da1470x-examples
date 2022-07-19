@@ -5,9 +5,24 @@
  *
  * @brief Configuration of devices connected to board
  *
- * Copyright (C) 2021-2022 Dialog Semiconductor.
- * This computer program includes Confidential, Proprietary Information
- * of Dialog Semiconductor. All Rights Reserved.
+ * Copyright (c) 2022 Dialog Semiconductor. All rights reserved.
+ *
+ * This software ("Software") is owned by Dialog Semiconductor. By using this Software
+ * you agree that Dialog Semiconductor retains all intellectual property and proprietary
+ * rights in and to this Software and any use, reproduction, disclosure or distribution
+ * of the Software without express written permission or a license agreement from Dialog
+ * Semiconductor is strictly prohibited. This Software is solely for use on or in
+ * conjunction with Dialog Semiconductor products.
+ *
+ * EXCEPT AS OTHERWISE PROVIDED IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR AS
+ * REQUIRED BY LAW, THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. EXCEPT AS OTHERWISE PROVIDED
+ * IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR BY LAW, IN NO EVENT SHALL DIALOG
+ * SEMICONDUCTOR BE LIABLE FOR ANY DIRECT, SPECIAL, INDIRECT, INCIDENTAL, OR
+ * CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE SOFTWARE.
  *
  ****************************************************************************************
  */
@@ -32,15 +47,6 @@ extern const ad_lcdc_io_conf_t tft12864_57_e_io;
 #endif
 #if dg_configUSE_LPM010M297B
 extern const ad_lcdc_io_conf_t lpm010m297b_io;
-#endif
-#if dg_configUSE_HM80160A090
-extern const ad_lcdc_io_conf_t hm80160a090_io;
-#endif
-#if dg_configUSE_E1394AA65A
-extern const ad_lcdc_io_conf_t e1394aa65a_io;
-#endif
-#if dg_configUSE_E1394AA65A_DSPI
-extern const ad_lcdc_io_conf_t e1394aa65a_dspi_io;
 #endif
 #if dg_configUSE_LPM012M134B
 extern const ad_lcdc_io_conf_t lpm012m134b_io;
@@ -77,15 +83,6 @@ extern const ad_lcdc_io_conf_t lpm013m091a_io;
 #endif
 #if dg_configUSE_ILI9341
 extern const ad_lcdc_io_conf_t ili9341_io;
-#endif
-#if dg_configUSE_XSJ120TY2401_QSPI || dg_configUSE_XSJ120TY2401_DSPI || dg_configUSE_XSJ120TY2401_SPI3 || dg_configUSE_XSJ120TY2401_SPI4
-extern const ad_lcdc_io_conf_t xsj120ty2401_spi_io;
-#endif
-#if dg_configUSE_XSJ120TY2401_DBIB
-extern const ad_lcdc_io_conf_t xsj120ty2401_dbib_io;
-#endif
-#if dg_configUSE_ONOC40108_SPI4
-extern const ad_lcdc_io_conf_t onoc40108_spi4_io;
 #endif
 #if dg_configUSE_MRB3973_DBIB
 extern const ad_lcdc_io_conf_t mrb3973_dbib_io;

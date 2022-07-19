@@ -5,9 +5,24 @@
  *
  * @brief Display driver
  *
- * Copyright (C) 2021-2022 Dialog Semiconductor.
- * This computer program includes Confidential, Proprietary Information
- * of Dialog Semiconductor. All Rights Reserved.
+ * Copyright (c) 2022 Dialog Semiconductor. All rights reserved.
+ *
+ * This software ("Software") is owned by Dialog Semiconductor. By using this Software
+ * you agree that Dialog Semiconductor retains all intellectual property and proprietary
+ * rights in and to this Software and any use, reproduction, disclosure or distribution
+ * of the Software without express written permission or a license agreement from Dialog
+ * Semiconductor is strictly prohibited. This Software is solely for use on or in
+ * conjunction with Dialog Semiconductor products.
+ *
+ * EXCEPT AS OTHERWISE PROVIDED IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR AS
+ * REQUIRED BY LAW, THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. EXCEPT AS OTHERWISE PROVIDED
+ * IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR BY LAW, IN NO EVENT SHALL DIALOG
+ * SEMICONDUCTOR BE LIABLE FOR ANY DIRECT, SPECIAL, INDIRECT, INCIDENTAL, OR
+ * CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE SOFTWARE.
  *
  ****************************************************************************************
  */
@@ -80,6 +95,8 @@ PRIVILEGED_DATA static uint64_t flush_evt_wait;
 
 void lv_port_disp_init(void)
 {
+        (void)(lvgl_ext_versionid);
+
         /*-------------------------
          * Initialize your display
          * -----------------------*/
@@ -365,11 +382,6 @@ static void disp_flush(lv_disp_drv_t *disp_drv, const lv_area_t *area, lv_color_
         lv_port_gpu_flush();
 #endif
 
-#if 0
-        /* Visualize partial update area */
-        lv_port_gpu_render_box(disp_drv, color_p, lv_area_get_width(area), 0, 0,
-                lv_area_get_width(area), lv_area_get_height(area), lv_color_make(0xFF, 0, 0));
-#endif
 
         gdi_set_partial_update_area(LAYER_OFFSET_X + area->x1, LAYER_OFFSET_Y + area->y1,
                 LAYER_OFFSET_X + area->x2, LAYER_OFFSET_Y + area->y2);

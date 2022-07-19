@@ -1,21 +1,28 @@
 /**
- * \addtogroup UI
- * \{
- * \addtogroup GDI
- *
- * \brief Graphics Device Interface
- * \{
- */
-/**
  ****************************************************************************************
  *
  * @file gdi.h
  *
  * @brief Graphics Device Interface
  *
- * Copyright (C) 2020-2022 Dialog Semiconductor.
- * This computer program includes Confidential, Proprietary Information
- * of Dialog Semiconductor. All Rights Reserved.
+ * Copyright (c) 2022 Dialog Semiconductor. All rights reserved.
+ *
+ * This software ("Software") is owned by Dialog Semiconductor. By using this Software
+ * you agree that Dialog Semiconductor retains all intellectual property and proprietary
+ * rights in and to this Software and any use, reproduction, disclosure or distribution
+ * of the Software without express written permission or a license agreement from Dialog
+ * Semiconductor is strictly prohibited. This Software is solely for use on or in
+ * conjunction with Dialog Semiconductor products.
+ *
+ * EXCEPT AS OTHERWISE PROVIDED IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR AS
+ * REQUIRED BY LAW, THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+ * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. EXCEPT AS OTHERWISE PROVIDED
+ * IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR BY LAW, IN NO EVENT SHALL DIALOG
+ * SEMICONDUCTOR BE LIABLE FOR ANY DIRECT, SPECIAL, INDIRECT, INCIDENTAL, OR
+ * CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+ * ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE SOFTWARE.
  *
  ****************************************************************************************
  */
@@ -45,19 +52,12 @@
 typedef uint16_t gdi_coord_t;
 
 typedef enum {
-#if (DEVICE_FAMILY == DA1469X)
-        GDI_FORMAT_L1,
-        GDI_FORMAT_L4,
-        GDI_FORMAT_L8,
-#endif
         GDI_FORMAT_RGB332,
         GDI_FORMAT_RGB565,
         GDI_FORMAT_RGBA5551,
-#if (DEVICE_FAMILY == DA1470X)
         GDI_FORMAT_RGB888,
         GDI_FORMAT_RGBA4444,
         GDI_FORMAT_ARGB4444,
-#endif
         GDI_FORMAT_ARGB8888,
         GDI_FORMAT_RGBA8888,
         GDI_FORMAT_ABGR8888,
@@ -782,17 +782,6 @@ bool gdi_get_layer_enable(HW_LCDC_LAYER layer_no);
  * \return Previous color LUT address
  */
 uint32_t * gdi_set_palette_lut(uint32_t *palette_lut);
-
-/**
- * \brief Get palette entries
- *
- * \param[in]  index       Start index to read from
- * \param[in]  color       Array to store the palette entries
- * \param[in]  color_num   Number of palette entries to read
- *
- * \return Number of entries read
- */
-int gdi_get_palette_lut(int index, uint32_t *color, int color_num);
 
 /**
  * \brief Indicates that a specific render operation has started (used for performance measurements)
