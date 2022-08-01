@@ -15,4 +15,4 @@ generate_obj_dump_file: $(FILENAME)_objdump.txt
 
 
 %_objdump.txt: %.elf
-	"$(TOOLCHAIN_PATH)/arm-none-eabi-objdump" -S $< > $@
+	"arm-none-eabi-objdump" -S $< > $@
