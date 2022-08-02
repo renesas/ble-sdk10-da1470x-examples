@@ -1,23 +1,14 @@
 # Watch Demo Instructions
 
-## Port Watch Demo into GA SDK Release
-Extract watch_demo-lvgl.zip into sdk root folder. 
-1. lvgl library will be extracted at utilities folder.
-2. watch_demo_lvgl project will be extracted at projects/dk_apps/demos folder.
-3. WatchDemoResources.bin file, containing the required resources for the watch demo, will be extracted at binaries folder.
-   
+## Build the GPU driver
+1. Import the libd2_driver project.
+2. Build the DA1470x-00-Release configuration.
 
-## Write Watch Demo resources' binaries to QSPI Flash
-Use SEGGER J-Link GDB Server and cli_programmer.exe to write the resources binary into the QSPI Flash. 
-1. Open the SEGGER J-Link GDB Server.
-2. Select USB as Connection to J-Link.
-3. Select DA1470x as Target Device and Little Endian support.
-4. The Target interface is SWD with Auto speed or Fixed at 4000 kHz.
-5. Press OK to connect.
-6. Select the J-Link emulator with the smaller number.  
-7. Open a Windows PowerShell and navigate into binaries folder of the root SDK folder.
-8. Type the following command to write the resources to flash
-	`.\cli_programmer.exe gdbserver write_oqspi 0x00100000 .\WatchDemoResources.bin`
+## Write the Watch Demo resources binary to the QSPI External Flash
+1. The cli_programmer.exe, uartboot.bin and mkimage.exe applications should be already built in order to be able to write the resources at the Flash.
+2. Open a Windows PowerShell and navigate into binaries folder of the root SDK folder.
+3. Use the following command to write the resources to the QSPI External flash
+	`./cli_programmer.exe -i 115200 -s 115200 COM8 write_qspi 0x0 ..\..\projects\target_apps\demos\watch_demo_lvgl\ui\demo\resources\bitmaps\WatchDemoColoredResources.bin`
 
 ## Build Configurations
 1. DA1470x-00-Debug_OQSPI_demo build configuration. The user can interact with the watch demo application by touching the LCD screen.
@@ -59,7 +50,6 @@ The logging and the output of the performance metrics are available in a serial 
 | FILE | DEFINITION | DEFAULT VALUE | VALUES | NOTES |
 | ------------ | ------------ | ------------ | ------------ | ------------ |
 | Project file | _DEBUG | | | Enables the log module. This definition should be enabled only in development mode, since the performance of the application is reduced. |
-| ui/lvgl/config/lvgl_conf.h | LV_COLOR_CHROMA_KEY | lv_color_hex(0x00ff00) | lv_color_hex(0x00ff00) | Images pixels with this color will not be drawn if they are  chroma keyed. Pure green is used as chroma key. | 
 | ui/lvgl/config/lvgl_conf.h | LV_DISP_DEF_REFR_PERIOD | 15 | 15 or 30 | Default display refresh period. LVG will redraw changed areas with this period time (in msec)
 | ui/lvgl/config/lvgl_conf.h | LV_INDEV_DEF_READ_PERIOD | 15 | 15 or 30 | Input device read period in milliseconds. |
 

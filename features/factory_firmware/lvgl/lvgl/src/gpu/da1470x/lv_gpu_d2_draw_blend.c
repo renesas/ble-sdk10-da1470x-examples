@@ -729,7 +729,7 @@ LV_ATTRIBUTE_FAST_MEM static void map_normal(const lv_area_t * disp_area, lv_col
 
 #if (DLG_LVGL_CF == 1)
     // Check if there is an image that must be handled by the GPU
-    if (!lv_img_cf_use_sw(cf) | lv_area_get_size(draw_area) > DLG_LVGL_GPU_BLIT_MASK_SIZE_LIMIT) {
+    if ((!lv_img_cf_use_sw(cf) | lv_area_get_size(draw_area)) > DLG_LVGL_GPU_BLIT_MASK_SIZE_LIMIT) {
         if(disp->driver->gpu_blit_with_mask_cb && disp->driver->gpu_config_blit_cb) {
             lv_draw_img_dsc_t dsc;
             lv_draw_img_dsc_init(&dsc);

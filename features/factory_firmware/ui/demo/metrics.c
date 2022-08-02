@@ -17,7 +17,7 @@
 
 #define METRICS_MAX               (1000)
 #define METRICS_TAG_MAX           (10)
-#define MAX_OS_TASK_NUM           (8)
+#define MAX_OS_TASK_NUM           (10)
 #define GUI_THREAD_NAME           ("GUI thread")
 
 static struct {
@@ -37,7 +37,7 @@ static void get_GUI_thread_CPU_time(uint32_t *task_time, uint32_t *runtime)
         uint8_t i;
         uint8_t os_task_count;
 
-        os_task_count = uxTaskGetSystemState(task_status_array, uxTaskGetNumberOfTasks(), runtime);
+        os_task_count = uxTaskGetSystemState(task_status_array, ARRAY_LENGTH(task_status_array), runtime);
         for (i = 0; i < os_task_count; i++) {
                 if (strcmp(task_status_array[i].pcTaskName, GUI_THREAD_NAME) == 0) {
                         *task_time = task_status_array[i].ulRunTimeCounter;

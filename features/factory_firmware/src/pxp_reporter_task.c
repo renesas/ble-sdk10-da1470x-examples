@@ -5,14 +5,13 @@
  *
  * @brief PXP profile application implementation
  *
- * Copyright (C) 2015-2021 Dialog Semiconductor.
+ * Copyright (C) 2015-2022 Dialog Semiconductor.
  * This computer program includes Confidential, Proprietary Information
  * of Dialog Semiconductor. All Rights Reserved.
  *
  ****************************************************************************************
  */
 
-#include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
 #include "osal.h"
@@ -31,8 +30,7 @@
 #include "ad_nvparam.h"
 #include "ad_gpadc.h"
 #include "hw_gpio.h"
-#include "sys_trng.h"
-#include "sys_drbg.h"
+
 
 #include "hw_led.h"
 
@@ -72,6 +70,9 @@ __RETAINED_RW static bool suota_ongoing = false;
 
 
 
+#define UUID_SUOTA_LSB                  (dg_configBLE_UUID_SUOTA_SERVICE & 0xFF)
+#define UUID_SUOTA_MSB                  ((dg_configBLE_UUID_SUOTA_SERVICE & 0xFF00) >> 8)
+
 /*
  * PXP advertising and scan response data
  *
@@ -84,7 +85,7 @@ static const gap_adv_ad_struct_t adv_data[] = {
         GAP_ADV_AD_STRUCT_BYTES(GAP_DATA_TYPE_UUID16_LIST_INC,
                                 0x03, 0x18,  // = 0x1803 (LLS UUID)
                                 0x02, 0x18,  // = 0x1802 (IAS UUID)
-                                0xF5, 0xFE)  // = 0xFEF5 (DIALOG SUOTA UUID)
+                                UUID_SUOTA_LSB, UUID_SUOTA_MSB)
 #else
         GAP_ADV_AD_STRUCT_BYTES(GAP_DATA_TYPE_UUID16_LIST_INC,
                                 0x03, 0x18,  // = 0x1803 (LLS UUID)
@@ -229,26 +230,6 @@ static void led_blink_tim_cb(OS_TIMER timer)
         OS_TASK_NOTIFY(task, BLINK_TMO_NOTIF, OS_NOTIFY_SET_BITS);
 }
 
-void print_own_address(void) {
-
-        own_address_t addr;
-
-
-        ble_gap_address_get(&addr);
-        printf("\r\nDevice address: ");
-        for(int i= sizeof(addr.addr) - 1;i >=0;i--) {
-                printf("%02X",addr.addr[i]);
-                if(i != 0){
-                        printf(":");
-                } else {
-                        printf("\r\n\r\n");
-                }
-
-        }
-        fflush(stdout);
-
-
-}
 
 static void led_toggle(void)
 {
@@ -413,24 +394,12 @@ static void conn_param_update_for_suota(uint16_t conn_idx)
 }
 #endif
 
+
 #if (PX_REPORTER_INCLUDE_BAS == 1)
-#if (dg_configUSE_SOC == 1)
-static uint8_t read_battery_level(void)
-{
-        int16_t level;
 
-        /*
-         * The return value from socf_get_soc is from 0(0%) to 1000(100.0%).
-         * The input parameter of bas_set_level is from 0(0%) to 100(100%).
-         */
-        level = (socf_get_soc() + 5) / 10;
-
-        return level;
-}
-#else
+#if (dg_configGPADC_ADAPTER == 1)
 /*
  * The values depend on the battery type.
- * MIN_BATTERY_LEVEL (in mVolts) must correspond to dg_configBATTERY_LOW_LEVEL (in ADC units).
  */
 #define MAX_BATTERY_LEVEL 4200
 #define MIN_BATTERY_LEVEL 2800
@@ -450,39 +419,51 @@ static uint8_t bat_level(uint16_t voltage)
         return (uint8_t) ((int) (voltage - MIN_BATTERY_LEVEL) * 100 /
                                                         (MAX_BATTERY_LEVEL - MIN_BATTERY_LEVEL));
 }
+#endif /* (dg_configGPADC_ADAPTER == 1) */
 
 static uint8_t read_battery_level(void)
 {
+#ifdef DECLARE_DUMMY_READ_BATTERY_LEVEL
+                {
+                uint8_t level;
+                static uint8_t dummy_level = 100;
+
+                level = dummy_level--;
+
+                /* Handle wrap-around */
+                if (dummy_level > 100) {
+                        dummy_level = 100;
+                }
+
+                return level;
+        }
+#endif /*DECLARE_DUMMY_READ_BATTERY_LEVEL */
+#if (dg_configUSE_SOC == 1)
+        uint16_t level_soc;
+
+        /*
+         * The return value from socf_get_soc is from 0(0%) to 1000(100.0%).
+         * The input parameter of bas_set_level is from 0(0%) to 100(100%).
+         */
+        level_soc = (socf_get_soc() + 5) / 10;
+
+        return level_soc;
+#else /*dg_configUSE_SOC == 0 */
+#if (dg_configGPADC_ADAPTER == 1)
         uint16_t bat_voltage;
         uint16_t value;
         ad_gpadc_handle_t handle;
         extern const ad_gpadc_controller_conf_t BATTERY_LEVEL;
 
         handle = ad_gpadc_open(&BATTERY_LEVEL);
-        ad_gpadc_read(handle, &value);
-        bat_voltage = ad_gpadc_conv_to_batt_mvolt(value);
+        ad_gpadc_read_nof_conv(handle, 1, &value);
+        bat_voltage = ad_gpadc_conv_raw_to_batt_mvolt(BATTERY_LEVEL.drv, value);
         ad_gpadc_close(handle, false);
 
         return bat_level(bat_voltage);
+#endif /* (dg_configGPADC_ADAPTER == 1) */
+#endif /* dg_configUSE_SOC == 1 */
 }
-#endif /* (dg_configUSE_SOC == 1) */
-
-#ifdef DECLARE_DUMMY_READ_BATTERY_LEVEL
-static uint8_t dummy_read_battery_level(void)
-{
-        static uint8_t dummy_level = 100;
-        uint8_t level;
-
-        level = dummy_level--;
-
-        /* Handle wrap-around */
-        if (dummy_level > 100) {
-                dummy_level = 100;
-        }
-
-        return level;
-}
-#endif /* DECLARE_BATTERY_LEVEL_DUMMY_READ */
 
 static void bas_update(void)
 {
@@ -493,6 +474,7 @@ static void bas_update(void)
         bas_set_level(bas, level, true);
 }
 #endif /* (PX_REPORTER_INCLUDE_BAS == 1) */
+
 
 static void handle_evt_gap_connected(ble_evt_gap_connected_t *evt)
 {
@@ -730,19 +712,6 @@ OS_TASK_FUNCTION(pxp_reporter_task, params)
         /* Get device name from NVPARAM if valid or use default otherwise */
         name_len = read_name(MAX_NAME_LEN, name_buf);
 
-        own_address_t addr = {
-                .addr_type = PRIVATE_STATIC_ADDRESS,
-                .addr[4] = 0x34,
-                .addr[5] = 0xFA,
-        };
-
-
-        sys_drbg_read_rand(&addr.addr);
-
-        ble_gap_address_set(&addr, 0x7530); // 5 min
-
-        sprintf(&name_buf[name_len - 4],"%02X%02X",addr.addr[1],addr.addr[0]);
-
         /* Set device name */
         ble_gap_device_name_set(name_buf, ATT_PERM_READ);
 
@@ -821,15 +790,6 @@ OS_TASK_FUNCTION(pxp_reporter_task, params)
         ble_gap_adv_start(GAP_CONN_MODE_UNDIRECTED);
         OS_TIMER_START(adv_tim, OS_TIMER_FOREVER);
 
-        do_alert(0);
-
-         printf("\r\n#######################\r\n");
-         printf("DA1470x Proximity reporter\r\n");
-         printf("#######################\r\n");
-
-         fflush(stdout);
-
-         print_own_address();
 
 #if (PX_REPORTER_INCLUDE_BAS == 1)
 

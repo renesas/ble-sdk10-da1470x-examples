@@ -93,12 +93,12 @@ static void system_init(void *pvParameters)
 
         OS_TASK handle;
         sys_clk_t sys_clk_prio[5] = {
-                sysclk_PLL160,
-                sysclk_RCHS_96,
-                sysclk_RCHS_32,
-                sysclk_XTAL32M,
-                sysclk_RCHS_64,
-        };
+                 sysclk_PLL160,
+                 sysclk_XTAL32M,
+                 sysclk_RCHS_96,
+                 sysclk_RCHS_32,
+                 sysclk_RCHS_64,
+         };
 
         cm_sys_clk_set_priority(sys_clk_prio);
         cm_sys_clk_init(sysclk_XTAL32M);

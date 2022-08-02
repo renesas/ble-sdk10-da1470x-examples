@@ -67,7 +67,7 @@
 		<link>
 			<name>sdk/intrinsic</name>
 			<type>2</type>
-			<location>C:/Workspace/LPC_CS_DA1470x_SDK_10/sdk/middleware/intrinsic</location>
+			<locationURI>SDKROOT/sdk/middleware/intrinsic</locationURI>
 		</link>
 		<link>
 			<name>sdk/ldscripts</name>
