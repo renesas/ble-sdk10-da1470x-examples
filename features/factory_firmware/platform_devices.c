@@ -44,7 +44,7 @@ static const ad_io_conf_t h13tb18a_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t h13tb18a_io = {
         .voltage_level = HW_GPIO_POWER_VDD1V8P,
-        .io_cnt = sizeof(h13tb18a_gpio_cfg) / sizeof(h13tb18a_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(h13tb18a_gpio_cfg),
         .io_list = h13tb18a_gpio_cfg,
 };
 #endif /* dg_configUSE_H13TB18A */
@@ -61,7 +61,7 @@ static const ad_io_conf_t tft12864_57_e_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t tft12864_57_e_io = {
         .voltage_level = HW_GPIO_POWER_VDD1V8P,
-        .io_cnt = sizeof(tft12864_57_e_gpio_cfg) / sizeof(tft12864_57_e_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(tft12864_57_e_gpio_cfg),
         .io_list = tft12864_57_e_gpio_cfg,
 };
 #endif /* dg_configUSE_TFT12864_57_E */
@@ -77,7 +77,7 @@ static const ad_io_conf_t lpm010m297b_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t lpm010m297b_io = {
         .voltage_level = HW_GPIO_POWER_VDD1V8P,
-        .io_cnt = sizeof(lpm010m297b_gpio_cfg) / sizeof(lpm010m297b_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(lpm010m297b_gpio_cfg),
         .io_list = lpm010m297b_gpio_cfg,
 };
 #endif /* dg_configUSE_LPM010M297B */
@@ -93,7 +93,7 @@ static const ad_io_conf_t hm80160a090_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t hm80160a090_io = {
         .voltage_level = HW_GPIO_POWER_VDD1V8P,
-        .io_cnt = sizeof(hm80160a090_gpio_cfg) / sizeof(hm80160a090_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(hm80160a090_gpio_cfg),
         .io_list = hm80160a090_gpio_cfg,
 };
 #endif /* dg_configUSE_HM80160A090 */
@@ -109,7 +109,7 @@ static const ad_io_conf_t ili9341_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t ili9341_io = {
         .voltage_level = HW_GPIO_POWER_V33,
-        .io_cnt = sizeof(ili9341_gpio_cfg) / sizeof(ili9341_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(ili9341_gpio_cfg),
         .io_list = ili9341_gpio_cfg,
 };
 #endif /* dg_configUSE_ILI9341 */
@@ -127,7 +127,7 @@ static const ad_io_conf_t e1394aa65a_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t e1394aa65a_io = {
         .voltage_level = HW_GPIO_POWER_VDD1V8P,
-        .io_cnt = sizeof(e1394aa65a_gpio_cfg) / sizeof(e1394aa65a_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(e1394aa65a_gpio_cfg),
         .io_list = e1394aa65a_gpio_cfg,
 };
 #endif /* dg_configUSE_E1394AA65A */
@@ -145,7 +145,7 @@ static const ad_io_conf_t e1394aa65a_dspi_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t e1394aa65a_dspi_io = {
         .voltage_level = HW_GPIO_POWER_VDD1V8P,
-        .io_cnt = sizeof(e1394aa65a_dspi_gpio_cfg) / sizeof(e1394aa65a_dspi_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(e1394aa65a_dspi_gpio_cfg),
         .io_list = e1394aa65a_dspi_gpio_cfg,
 };
 #endif /* dg_configUSE_E1394AA65A_DSPI */
@@ -171,7 +171,7 @@ static const ad_io_conf_t lpm012m134b_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t lpm012m134b_io = {
         .voltage_level = HW_GPIO_POWER_V33,
-        .io_cnt = sizeof(lpm012m134b_gpio_cfg) / sizeof(lpm012m134b_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(lpm012m134b_gpio_cfg),
         .io_list = lpm012m134b_gpio_cfg,
 };
 #endif /* dg_configUSE_LPM012M134B */
@@ -196,26 +196,9 @@ static const ad_io_conf_t nhd43480272efasxn_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t nhd43480272efasxn_io = {
         .voltage_level = HW_GPIO_POWER_V33,
-        .io_cnt = sizeof(nhd43480272efasxn_gpio_cfg) / sizeof(nhd43480272efasxn_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(nhd43480272efasxn_gpio_cfg),
         .io_list = nhd43480272efasxn_gpio_cfg,
 };
-
-#if dg_configUSE_FT5306
-/* I2C I/O pins configurations */
-const ad_i2c_io_conf_t ft5306_io = {
-        .scl = {
-              .port = FT5306_SCL_PORT, .pin = FT5306_SCL_PIN,
-              .on  = { HW_GPIO_MODE_OUTPUT_OPEN_DRAIN, HW_GPIO_FUNC_I2C_SCL, false },
-              .off = { HW_GPIO_MODE_INPUT,             HW_GPIO_FUNC_GPIO,    true  },
-        },
-        .sda = {
-             .port = FT5306_SDA_PORT, .pin = FT5306_SDA_PIN,
-             .on   = { HW_GPIO_MODE_OUTPUT_OPEN_DRAIN, HW_GPIO_FUNC_I2C_SDA, false },
-             .off  = { HW_GPIO_MODE_INPUT,             HW_GPIO_FUNC_GPIO,    true  },
-        },
-        .voltage_level = HW_GPIO_POWER_V33
-};
-#endif /* dg_configUSE_FT5306 */
 #endif /* dg_configUSE_NHD43480272EFASXN */
 
 #if dg_configUSE_LS013B7DH06
@@ -229,7 +212,7 @@ static const ad_io_conf_t ls013b7dh06_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t ls013b7dh06_io = {
         .voltage_level = HW_GPIO_POWER_V33,
-        .io_cnt = sizeof(ls013b7dh06_gpio_cfg) / sizeof(ls013b7dh06_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(ls013b7dh06_gpio_cfg),
         .io_list = ls013b7dh06_gpio_cfg,
 };
 #endif /* dg_configUSE_LS013B7DH06 */
@@ -245,7 +228,7 @@ static const ad_io_conf_t ls013b7dh03_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t ls013b7dh03_io = {
         .voltage_level = HW_GPIO_POWER_V33,
-        .io_cnt = sizeof(ls013b7dh03_gpio_cfg) / sizeof(ls013b7dh03_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(ls013b7dh03_gpio_cfg),
         .io_list = ls013b7dh03_gpio_cfg,
 };
 #endif /* dg_configUSE_LS013B7DH03 */
@@ -266,7 +249,7 @@ static const ad_io_conf_t dt280qv10ct_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t dt280qv10ct_io = {
         .voltage_level = HW_GPIO_POWER_V33,
-        .io_cnt = sizeof(dt280qv10ct_gpio_cfg) / sizeof(dt280qv10ct_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(dt280qv10ct_gpio_cfg),
         .io_list = dt280qv10ct_gpio_cfg,
 };
 
@@ -285,7 +268,7 @@ static const ad_io_conf_t t1d3bp006_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t t1d3bp006_io = {
         .voltage_level = HW_GPIO_POWER_V33,
-        .io_cnt = sizeof(t1d3bp006_gpio_cfg) / sizeof(t1d3bp006_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(t1d3bp006_gpio_cfg),
         .io_list = t1d3bp006_gpio_cfg,
 };
 #endif /* dg_configUSE_T1D3BP006 */
@@ -300,7 +283,7 @@ static const ad_io_conf_t t1d54bp002_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t t1d54bp002_io = {
         .voltage_level = HW_GPIO_POWER_V33,
-        .io_cnt = sizeof(t1d54bp002_gpio_cfg) / sizeof(t1d54bp002_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(t1d54bp002_gpio_cfg),
         .io_list = t1d54bp002_gpio_cfg,
 };
 #endif /* dg_configUSE_T1D54BP002 */
@@ -318,7 +301,7 @@ static const ad_io_conf_t psp27801_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t psp27801_io = {
         .voltage_level = HW_GPIO_POWER_V33,
-        .io_cnt = sizeof(psp27801_gpio_cfg) / sizeof(psp27801_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(psp27801_gpio_cfg),
         .io_list = psp27801_gpio_cfg,
 };
 #endif /* dg_configUSE_PSP27801 */
@@ -334,7 +317,7 @@ static const ad_io_conf_t mct024l6w240320pml_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t mct024l6w240320pml_io = {
         .voltage_level = HW_GPIO_POWER_V33,
-        .io_cnt = sizeof(mct024l6w240320pml_gpio_cfg) / sizeof(mct024l6w240320pml_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(mct024l6w240320pml_gpio_cfg),
         .io_list = mct024l6w240320pml_gpio_cfg,
 };
 #endif /* dg_configUSE_MCT024L6W240320PML */
@@ -352,7 +335,7 @@ static const ad_io_conf_t lpm013m091a_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t lpm013m091a_io = {
         .voltage_level = HW_GPIO_POWER_VDD1V8P,
-        .io_cnt = sizeof(lpm013m091a_gpio_cfg) / sizeof(lpm013m091a_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(lpm013m091a_gpio_cfg),
         .io_list = lpm013m091a_gpio_cfg,
 };
 #endif /* dg_configUSE_LPM013M091A */
@@ -376,7 +359,7 @@ static const ad_io_conf_t xsj120ty2401_spi_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t xsj120ty2401_spi_io = {
         .voltage_level = HW_GPIO_POWER_VDD1V8P,
-        .io_cnt = sizeof(xsj120ty2401_spi_gpio_cfg) / sizeof(xsj120ty2401_spi_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(xsj120ty2401_spi_gpio_cfg),
         .io_list = xsj120ty2401_spi_gpio_cfg,
 };
 #endif /* dg_configUSE_XSJ120TY2401_QSPI || dg_configUSE_XSJ120TY2401_DSPI || dg_configUSE_XSJ120TY2401_SPI3 || dg_configUSE_XSJ120TY2401_SPI4 */
@@ -401,7 +384,7 @@ static const ad_io_conf_t xsj120ty2401_dbib_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t xsj120ty2401_dbib_io = {
         .voltage_level = HW_GPIO_POWER_VDD1V8P,
-        .io_cnt = sizeof(xsj120ty2401_dbib_gpio_cfg) / sizeof(xsj120ty2401_dbib_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(xsj120ty2401_dbib_gpio_cfg),
         .io_list = xsj120ty2401_dbib_gpio_cfg,
 };
 #endif /* dg_configUSE_XSJ120TY2401_DBIB */
@@ -418,7 +401,7 @@ static const ad_io_conf_t onoc40108_spi4_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t onoc40108_spi4_io = {
         .voltage_level = HW_GPIO_POWER_VDD1V8P,
-        .io_cnt = sizeof(onoc40108_spi4_gpio_cfg) / sizeof(onoc40108_spi4_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(onoc40108_spi4_gpio_cfg),
         .io_list = onoc40108_spi4_gpio_cfg,
 };
 #endif
@@ -443,7 +426,7 @@ static const ad_io_conf_t mrb3973_dbib_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t mrb3973_dbib_io = {
         .voltage_level = HW_GPIO_POWER_V33,
-        .io_cnt = sizeof(mrb3973_dbib_gpio_cfg) / sizeof(mrb3973_dbib_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(mrb3973_dbib_gpio_cfg),
         .io_list = mrb3973_dbib_gpio_cfg,
 };
 #endif
@@ -456,37 +439,36 @@ static const ad_io_conf_t boe139f454sm_gpio_cfg[] = {
 
 const ad_lcdc_io_conf_t boe139f454sm_io = {
         .voltage_level = HW_GPIO_POWER_VDD1V8P,
-        .io_cnt = sizeof(boe139f454sm_gpio_cfg) / sizeof(boe139f454sm_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(boe139f454sm_gpio_cfg),
         .io_list = boe139f454sm_gpio_cfg,
 };
 #endif
 
 #if dg_configUSE_E120A390QSR
 static const ad_io_conf_t e120a390qsr_gpio_cfg[] = {
-        { E120A390QSR_SCL_PORT, E120A390QSR_SCL_PIN, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_LCD_SPI_CLK, true  }, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, true  }},
-        { E120A390QSR_SD0_PORT, E120A390QSR_SD0_PIN, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_LCD_SPI_DO,  true  }, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, true  }},
-        { E120A390QSR_SD1_PORT, E120A390QSR_SD1_PIN, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_LCD_SPI_DC,  true  }, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, true  }},
+        { E120A390QSR_SCL_PORT, E120A390QSR_SCL_PIN, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_LCD_SPI_CLK, true  }, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, false }},
+        { E120A390QSR_SD0_PORT, E120A390QSR_SD0_PIN, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_LCD_SPI_DO,  true  }, { HW_GPIO_MODE_INPUT,  HW_GPIO_FUNC_GPIO, false }},
+        { E120A390QSR_SD1_PORT, E120A390QSR_SD1_PIN, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_LCD_SPI_DC,  true  }, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, false }},
 #if (DEVICE_FAMILY == DA1470X)
-        { E120A390QSR_SD2_PORT, E120A390QSR_SD2_PIN, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_LCD,         true  }, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, true  }},
-        { E120A390QSR_SD3_PORT, E120A390QSR_SD3_PIN, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_LCD,         true  }, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, true  }},
+        { E120A390QSR_SD2_PORT, E120A390QSR_SD2_PIN, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_LCD,         true  }, { HW_GPIO_MODE_INPUT,  HW_GPIO_FUNC_GPIO, false }},
+        { E120A390QSR_SD3_PORT, E120A390QSR_SD3_PIN, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_LCD,         true  }, { HW_GPIO_MODE_INPUT,  HW_GPIO_FUNC_GPIO, false }},
 #endif
         { E120A390QSR_RST_PORT, E120A390QSR_RST_PIN, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO,        true  }, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, true  }},
         { E120A390QSR_CSX_PORT, E120A390QSR_CSX_PIN, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_LCD_SPI_EN,  true  }, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, true  }},
-        { E120A390QSR_TE_PORT,  E120A390QSR_TE_PIN,  { HW_GPIO_MODE_INPUT,  HW_GPIO_FUNC_LCD,         true  }, { HW_GPIO_MODE_INPUT,  HW_GPIO_FUNC_GPIO, true  }},
+        { E120A390QSR_TE_PORT,  E120A390QSR_TE_PIN,  { HW_GPIO_MODE_INPUT,  HW_GPIO_FUNC_LCD,         true  }, { HW_GPIO_MODE_INPUT,  HW_GPIO_FUNC_GPIO, false }},
         { E120A390QSR_IM0_PORT, E120A390QSR_IM0_PIN, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO,        true  }, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, true  }},
         { E120A390QSR_IM1_PORT, E120A390QSR_IM1_PIN, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO,        false }, { HW_GPIO_MODE_OUTPUT, HW_GPIO_FUNC_GPIO, false }},
 };
 
 const ad_lcdc_io_conf_t e120a390qsr_io = {
         .voltage_level = HW_GPIO_POWER_VDD1V8P,
-        .io_cnt = sizeof(e120a390qsr_gpio_cfg) / sizeof(e120a390qsr_gpio_cfg[0]),
+        .io_cnt = ARRAY_LENGTH(e120a390qsr_gpio_cfg),
         .io_list = e120a390qsr_gpio_cfg,
 };
 #endif /* dg_configUSE_E120A390QSR */
 #endif /* dg_configLCDC_ADAPTER */
 
 #if dg_configUSE_FT6206
-/* I2C I/O pins configurations */
 const ad_i2c_io_conf_t ft6206_io = {
         { FT6206_SCL_PORT, FT6206_SCL_PIN, { HW_GPIO_MODE_OUTPUT_OPEN_DRAIN, HW_GPIO_FUNC_I2C_SCL, false }, { HW_GPIO_MODE_INPUT, HW_GPIO_FUNC_GPIO, true }},
         { FT6206_SDA_PORT, FT6206_SDA_PIN, { HW_GPIO_MODE_OUTPUT_OPEN_DRAIN, HW_GPIO_FUNC_I2C_SDA, false }, { HW_GPIO_MODE_INPUT, HW_GPIO_FUNC_GPIO, true }},
@@ -494,11 +476,19 @@ const ad_i2c_io_conf_t ft6206_io = {
 };
 #endif /* dg_configUSE_FT6206 */
 
+#if dg_configUSE_FT5306
+const ad_i2c_io_conf_t ft5306_io = {
+        { FT5306_SCL_PORT, FT5306_SCL_PIN, { HW_GPIO_MODE_OUTPUT_OPEN_DRAIN, HW_GPIO_FUNC_I2C_SCL, false }, { HW_GPIO_MODE_INPUT, HW_GPIO_FUNC_GPIO, true }},
+        { FT5306_SDA_PORT, FT5306_SDA_PIN, { HW_GPIO_MODE_OUTPUT_OPEN_DRAIN, HW_GPIO_FUNC_I2C_SDA, false }, { HW_GPIO_MODE_INPUT, HW_GPIO_FUNC_GPIO, true }},
+        .voltage_level = HW_GPIO_POWER_V33
+};
+#endif /* dg_configUSE_FT5306 */
+
 #if dg_configUSE_ZT2628
 const ad_i2c_io_conf_t zt2628_io = {
         { ZT2628_SCL_PORT, ZT2628_SCL_PIN, { HW_GPIO_MODE_OUTPUT_OPEN_DRAIN, HW_GPIO_FUNC_I2C_SCL, false }, { HW_GPIO_MODE_INPUT, HW_GPIO_FUNC_GPIO, true }},
         { ZT2628_SDA_PORT, ZT2628_SDA_PIN, { HW_GPIO_MODE_OUTPUT_OPEN_DRAIN, HW_GPIO_FUNC_I2C_SDA, false }, { HW_GPIO_MODE_INPUT, HW_GPIO_FUNC_GPIO, true }},
-        .voltage_level = HW_GPIO_POWER_V33
+        .voltage_level = HW_GPIO_POWER_VDD1V8P
 };
 #endif /* dg_configUSE_ZT2628 */
 
@@ -511,7 +501,7 @@ const ad_i2c_io_conf_t zt2628_io = {
 
 const ad_gpadc_driver_conf_t battery_level_driver = {
         .input_attenuator       = HW_GPADC_INPUT_VOLTAGE_UP_TO_0V9,
-        .positive               = HW_GPADC_INPUT_SE_VBAT,
+        .positive               = HW_GPADC_INP_VBAT,
         .result_mode            = HW_GPADC_RESULT_NORMAL,
         .input_mode             = HW_GPADC_INPUT_MODE_SINGLE_ENDED,
         .temp_sensor            = HW_GPADC_NO_TEMP_SENSOR,

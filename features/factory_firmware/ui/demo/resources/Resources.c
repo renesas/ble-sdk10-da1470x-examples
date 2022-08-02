@@ -13,8 +13,16 @@
  */
 #include "Resources.h"
 
+#define AT_XIP_FLASH                    (1)
+#define AT_S_FLASH                      (2)
+#define RESOURCES_LOCATION              AT_S_FLASH
+#if (RESOURCES_LOCATION == AT_XIP_FLASH)
 #define RESOURCES_OFFSET                (0x100000)
 #define RESOURCES_BASE_ADDRESS          (MEMORY_OQSPIC_S_BASE + RESOURCES_OFFSET)
+#elif (RESOURCES_LOCATION == AT_S_FLASH)
+#define RESOURCES_OFFSET                (0x0)
+#define RESOURCES_BASE_ADDRESS          (MEMORY_QSPIC_BASE + RESOURCES_OFFSET)
+#endif
 
 #define HEADER_OFFSET                   (sizeof(lv_img_header_t))
 

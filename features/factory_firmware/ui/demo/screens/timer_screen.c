@@ -125,6 +125,7 @@ static void gesture_event_cb(lv_event_t *e)
                 }
                 lv_scr_load(prev_active);
                 lv_obj_del(screen_obj);
+                lv_timer_del(counter_timer);
         }
 }
 

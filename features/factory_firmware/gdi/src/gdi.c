@@ -200,6 +200,8 @@ void *_gdi_get_frame_buffer_addr(void);
 static void frame_update_async_cb(AD_LCDC_ERROR status, void *cb_data);
 #endif
 
+int hw_lcdc_get_palette(int index,  uint32_t *color,int color_num);
+
 #ifdef PERFORMANCE_METRICS
 static int pixel_count;
 static int render_count;

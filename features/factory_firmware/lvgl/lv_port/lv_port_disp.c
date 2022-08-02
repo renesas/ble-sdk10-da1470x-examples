@@ -21,17 +21,6 @@
 #include "osal.h"
 #include "gdi.h"
 
-/*---------------------------------------------------------------------------
- * These helper macros are used to stringify a given macro */
-#define STR(s)           # s
-#define XSTR(s)          STR(s)
-
-static const char lvgl_ext_versionid[] = "v" XSTR(LVGL_CONF_VERSION_MAJOR)
-                                         "." XSTR(LVGL_CONF_VERSION_MINOR)
-                                         "." XSTR(LVGL_CONF_VERSION_PATCH)
-                                         "-" LVGL_CONF_VERSION_INFO
-                                         "-" XSTR(LVGL_CONF_VERSION_EXT);
-
 /*********************
  *      DEFINES
  *********************/

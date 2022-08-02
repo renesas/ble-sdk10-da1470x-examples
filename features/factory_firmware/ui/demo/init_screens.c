@@ -111,6 +111,12 @@ static void scroll_event_cb(lv_event_t *e)
                 if (code == LV_EVENT_SCROLL_BEGIN) {
                         if (completed_scroll_cnt == 0) {
                                 lv_propagate_to_children(obj, code);
+#ifdef PERFORMANCE_METRICS
+                                OS_ENTER_CRITICAL_SECTION();
+                                metrics_set_tag(METRICS_TAG_SLIDING_WATCH_FACE_TO_MENU);
+                                OS_LEAVE_CRITICAL_SECTION();
+#endif
+
 #if TWO_LAYERS_HORIZONTAL_SLIDING
                                 /* Change Rect values of all related windows to draw the second FB */
                                 if (lv_obj_get_scroll_right(obj) == DEMO_RESX) { //watch -> menu

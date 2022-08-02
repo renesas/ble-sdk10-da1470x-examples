@@ -46,11 +46,6 @@
 #define dg_configPOWER_1V8_ACTIVE               (1)
 #define dg_configPOWER_1V8_SLEEP                (1)
 
-#define dg_configOQSPI_FLASH_AUTODETECT         (1)
-//#define dg_configOQSPI_FLASH_HEADER_FILE        "oqspi_mx66um1g45g.h"
-//#define dg_configOQSPI_FLASH_CONFIG             oqspi_mx66um1g45g_cfg
-
-
 #define dg_configUSE_USB_CHARGER                (0)
 #define dg_configALLOW_CHARGING_NOT_ENUM        (1)
 #define dg_configUSE_USB_ENUMERATION            (1)
