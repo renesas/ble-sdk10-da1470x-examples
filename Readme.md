@@ -4,13 +4,13 @@ This is the repository storing example for the [DA1470x family](https://www.dial
 
 The available devices in the DA1470x family are:
 
-- [DA14701](https://www.dialog-semiconductor.com/products/bluetooth-low-energy/da1470x)
-- [DA14705](https://www.dialog-semiconductor.com/products/bluetooth-low-energy/da1470x)
-- [DA14706](https://www.dialog-semiconductor.com/products/bluetooth-low-energy/da1470x)
-- [DA14708](https://www.dialog-semiconductor.com/products/bluetooth-low-energy/da1470x)
+- [DA14701](https://www.renesas.com/us/en/products/interface-connectivity/wireless-communications/bluetooth-low-energy/da14701-highly-integrated-advanced-bluetooth-52-soc)
+- [DA14705](https://www.renesas.com/us/en/products/interface-connectivity/wireless-communications/bluetooth-low-energy/da14705-highly-integrated-advanced-bluetooth-52-soc)
+- [DA14706](https://www.renesas.com/us/en/products/interface-connectivity/wireless-communications/bluetooth-low-energy/da14706-highly-integrated-advanced-bluetooth-52-soc)
+- [DA14708](https://www.renesas.com/us/en/products/interface-connectivity/wireless-communications/bluetooth-low-energy/da14708-highly-integrated-advanced-bluetooth-52-soc)
 
 
-For information about the DA1470x platform and how to bring up your development kit, please refer to the [Getting started User Manual](https://www.dialog-semiconductor.com/DA1470x_Getting_Started_manual)
+For information about the DA1470x platform and how to bring up your development kit, please refer to the [Getting started User Manual](http://lpccs-docs.renesas.com/um-b-153-da1470x_getting_started/index.html)
 
 ## Example usage
 
