@@ -112,7 +112,7 @@
 		<link>
 			<name>snc/interface</name>
 			<type>2</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/i2c_master_slave_snc_sample_code/interface</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/i2c_thermo3_snc_sample_code/interface</locationURI>
 		</link>
 	</linkedResources>
 	<variableList>
