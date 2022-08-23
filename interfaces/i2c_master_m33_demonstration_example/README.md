@@ -1,14 +1,14 @@
-I2C Adapter Demonstration Example In SYSCPU Context.
-======================================================
+# I2C Adapter Demonstration Example In SYSCPU Context
 
 ## Example Description
 
-This example demonstrates using the I2C adapter layer employing the I2C1 block in master mode. The DA1470x family of devices comprises three separate I2C blocks instances. In this example, all of the I2C operations are executed in the SYSCPU context using the FreeRTOS preemptive scheduling. To facilitate user, the `THERMO3` click board, which is I2C- and microBUS-compatible is utilized. The board comes with the `TMP102` temperature sensor which can trigger an external signal once the temperature exceeds or falls within a configurable temperature range. In this demonstration, the sensor is configured in comparator mode in which the alert pin is asserted once the temperature equals or exceeds the Thigh threshold and for as long as the temperature falls below the Tlow threshold. The alert signal is connected to the WKUP controller which is triggered once the signal is asserted. A single task, namely `termo3_task`,  is created and is responsible for configurating the sensor and reading the temperature for as long as the alert signal is asserted. The sample code comes with full drivers of the TMP102 temperature sensor which can be found in the `tmp102_drv/header/tmp102_reg.h` file. 
+This example demonstrates using the I2C adapter layer employing the I2C1 block in master mode. The DA1470x family of devices comprises three separate I2C blocks instances. In this example, all of the I2C operations are executed in the SYSCPU context using the FreeRTOS preemptive scheduling. To facilitate user, the `THERMO3` click board, which is I2C- and microBUS-compatible is utilized. The board comes with the `TMP102` temperature sensor which can trigger an external signal once the temperature exceeds or falls within a configurable temperature range. In this demonstration, the sensor is configured in comparator mode in which the alert pin is asserted once the temperature equals or exceeds the Thigh threshold and for as long as the temperature falls below the Tlow threshold. The alert signal is connected to the WKUP controller which is triggered once the signal is asserted. A single task, namely `termo3_task`,  is created and is responsible for configurating the sensor and reading the temperature for as long as the alert signal is asserted. The sample code comes with full drivers of the TMP102 temperature sensor which can be found in the `tmp102_drv/header/tmp102_reg.h` file.
 
 ## HW and SW configuration
-**Hardware configuration**
 
-- This example runs on DA1470x Bluetooth Smart SoC devices. One DA1470x Pro Development kit and one THERMO3 click board are needed for this example. For more information on the temperature sensor demonstrated click [here]( https://www.mikroe.com/thermo-3-click). 
+### Hardware configuration
+
+- This example runs on DA1470x Bluetooth Smart SoC devices. One DA1470x Pro Development kit and one THERMO3 click board are needed for this example. For more information on the temperature sensor demonstrated click [here]( https://www.mikroe.com/thermo-3-click).
 - Connect the development kit to the host computer via the USB1 connector mounted on the motherboard and open a serial terminal. Two serial ports should be displayed; select the one with the lower number and then configure the terminal as depicted in the following table:
 
 |  Setting  | Value  |
@@ -24,13 +24,14 @@ This example demonstrates using the I2C adapter layer employing the I2C1 block i
   #define THERMO3_ALERT_PIN           ( HW_GPIO_PIN_24 )
   ```
 
-**Software configuration**
+### Software configuration
 
-  - Recommended to employ the latest SmartSnippets Studio version released.
-  - Download the latest SDK version
-  - SEGGER J-Link tools should be downloaded and installed.
+- Recommended to employ the latest SmartSnippets Studio version released.
+- Download the latest SDK version
+- SEGGER J-Link tools should be downloaded and installed.
 
 ## How to run the example
+
 **The RAM build configurations should be used for debugging purposes only.**
 
 ### Initial Setup
@@ -48,9 +49,9 @@ This example demonstrates using the I2C adapter layer employing the I2C1 block i
   #define THERMO3_ALERT_T_LOW        ( 25 )
   ```
 
-- Build the project by selecting either the debug or release OQSPI build configuration. 
+- Build the project by selecting either the debug or release OQSPI build configuration.
 
-- Download the firmware image into the XiP (eXecution-in Place) flash memory used by selecting the `program_oqspi_jtag` or  `program_oqspi_serial` launcher. If more actions are required follow the instructions given in the Console window of the Eclipse environment. 
+- Download the firmware image into the XiP (eXecution-in Place) flash memory used by selecting the `program_oqspi_jtag` or  `program_oqspi_serial` launcher. If more actions are required follow the instructions given in the Console window of the Eclipse environment.
 
   - The project is compiled with the flash memory autodetect feature enabled meaning that any supported OQSPI flash memory can be used without modifying the `custom_config_oqspi.h` file, that is:
 
@@ -59,10 +60,11 @@ This example demonstrates using the I2C adapter layer employing the I2C1 block i
     #define dg_configOQSPI_FLASH_AUTODETECT         ( 1 )
     ```
 
-- Press the `B1(RSTn)` push button mounted on the daughterboard, so the device starts executing its firmware. 
+- Press the `B1(RSTn)` push button mounted on the daughterboard, so the device starts executing its firmware.
 
 - The current temperature value should be displayed as long as the alert signal is asserted. For istance:
 
+```bash
   > Temperature: +26.0
   >
   > Temperature: +26.1
@@ -72,30 +74,8 @@ This example demonstrates using the I2C adapter layer employing the I2C1 block i
   > Temperature: +25.2
   >
   > Temperature: +25.0
+```
 
-## Known Limitations 
+## Known Limitations
 
-There are no known limitations for this example. 
-
-## License
-
-------
-
-Copyright (c) 2022 Dialog Semiconductor. All rights reserved.
-
-This software ("Software") is owned by Dialog Semiconductor. By using this Software
-you agree that Dialog Semiconductor retains all intellectual property and proprietary
-rights in and to this Software and any use, reproduction, disclosure or distribution
-of the Software without express written permission or a license agreement from Dialog
-Semiconductor is strictly prohibited. This Software is solely for use on or in
-conjunction with Dialog Semiconductor products.
-
-EXCEPT AS OTHERWISE PROVIDED IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR AS
-REQUIRED BY LAW, THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. EXCEPT AS OTHERWISE PROVIDED
-IN A LICENSE AGREEMENT BETWEEN THE PARTIES OR BY LAW, IN NO EVENT SHALL DIALOG
-SEMICONDUCTOR BE LIABLE FOR ANY DIRECT, SPECIAL, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES, OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
-PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
-ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THE SOFTWARE.
+There are no known limitations for this example.
