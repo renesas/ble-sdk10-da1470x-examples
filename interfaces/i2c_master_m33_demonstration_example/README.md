@@ -18,10 +18,10 @@ This example demonstrates using the I2C adapter layer employing the I2C1 block i
 | Stop bits |   1    |
 |  Parity   |  None  |
 
-- Connect the click board to mikroBUS #2. It's a prerequisite that the expansion headers have been soldered before attaching the click board. Alternatively, the user can occupy mikroBUS #1. If this is the case, the alert pin should be changed. To do so, go to the `config/peripheral_setup.h` file which contains all the I/O definitions of the demonstration example and change the alert pin value as follow:
+- Connect the click board to mikroBUS #2. It's a prerequisite that the expansion headers have been soldered before attaching the click board. Alternatively, the user can occupy mikroBUS #1. If this is the case, the alert pin should be changed. To do so, go to the `config/custom_config_osqpsi.h` or `config/custom_config_ram.h` depending on the selected build configuration and defien the following statement:
 
   ```c
-  #define THERMO3_ALERT_PIN           ( HW_GPIO_PIN_24 )
+  #define MIKRO_BUS           ( 1 )
   ```
 
 ### Software configuration

@@ -14,6 +14,10 @@
 
 #include "hw_gpio.h"
 
+#ifndef MIKRO_BUS
+#define MIKRO_BUS 2
+#endif
+
 #ifndef CONFIG_PERIPHERAL_SETUP_H_
 #define CONFIG_PERIPHERAL_SETUP_H_
 
@@ -25,7 +29,12 @@
 
 #define I2C_SLAVE_ADDRESS           ( 0x48 )
 
-#define THERMO3_ALERT_PORT          ( HW_GPIO_PORT_0 )
-#define THERMO3_ALERT_PIN           ( HW_GPIO_PIN_24 )
+#if MIKRO_BUS == 1
+    #define THERMO3_ALERT_PORT          ( HW_GPIO_PORT_0 )
+    #define THERMO3_ALERT_PIN           ( HW_GPIO_PIN_23 )
+#else
+    #define THERMO3_ALERT_PORT          ( HW_GPIO_PORT_0 )
+    #define THERMO3_ALERT_PIN           ( HW_GPIO_PIN_24 )
+#endif
 
 #endif /* CONFIG_PERIPHERAL_SETUP_H_ */
