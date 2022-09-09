@@ -20,7 +20,7 @@
 #define UART1_RX_PORT           ( HW_GPIO_PORT_1 )
 #define UART1_RX_PIN            ( HW_GPIO_PIN_8 )
 #define UART1_TX_PORT           ( HW_GPIO_PORT_1 )
-#define UART1_TX_PIN            ( HW_GPIO_PIN_9 )
+#define UART1_TX_PIN            ( HW_GPIO_PIN_10 )
 
 #define UART2_RX_PORT           ( HW_GPIO_PORT_2 )
 #define UART2_RX_PIN            ( HW_GPIO_PIN_1 )
