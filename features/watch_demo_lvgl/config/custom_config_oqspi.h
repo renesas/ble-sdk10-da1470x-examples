@@ -42,9 +42,6 @@
 #define dg_configEXEC_MODE                      MODE_IS_CACHED
 #define dg_configCODE_LOCATION                  NON_VOLATILE_IS_OQSPI_FLASH
 
-#define dg_configMEM_RETENTION_MODE             (0x1F)
-#define dg_configSHUFFLING_MODE                 (0x3)
-
 #define dg_configUSE_WDOG                       (0)
 
 #define dg_configFLASH_CONNECTED_TO             (FLASH_CONNECTED_TO_1V8)
@@ -52,10 +49,6 @@
 
 #define dg_configPOWER_1V8_ACTIVE               (1)
 #define dg_configPOWER_1V8_SLEEP                (1)
-
-#define dg_configUSE_USB                        0
-#define dg_configUSE_USB_CHARGER                0
-#define dg_configALLOW_CHARGING_NOT_ENUM        1
 
 #define dg_configUSE_SW_CURSOR                  (1)
 
